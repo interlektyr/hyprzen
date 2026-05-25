@@ -1,0 +1,65 @@
+{
+  "name": "home_office",
+  "created_at": "2026-05-25T15:59:31.139880906Z",
+  "updated_at": "2026-05-25T15:59:31.140064422Z",
+  "outputs": [
+    {
+      "key": "samsung electric company|ls24d60xu|hnaxc00823",
+      "match_key": "samsung electric company|ls24d60xu|hnaxc00823",
+      "name": "DP-1",
+      "make": "Samsung Electric Company",
+      "model": "LS24D60xU",
+      "serial": "HNAXC00823",
+      "enabled": true,
+      "mode": "2560x1440@59.95Hz",
+      "width": 2560,
+      "height": 1440,
+      "refresh": 59.95,
+      "x": 2048,
+      "y": 0,
+      "scale": 1.07,
+      "transform": 0,
+      "bitdepth": 8,
+      "cm": "srgb",
+      "sdr_brightness": 1,
+      "sdr_saturation": 1,
+      "sdr_min_luminance": 0.2,
+      "sdr_max_luminance": 80,
+      "min_luminance": 0
+    },
+    {
+      "key": "au optronics|0xc199",
+      "match_key": "au optronics|0xc199",
+      "name": "eDP-1",
+      "make": "AU Optronics",
+      "model": "0xC199",
+      "enabled": false,
+      "mode": "2560x1600@165.04Hz",
+      "width": 2560,
+      "height": 1600,
+      "refresh": 165.04,
+      "x": 0,
+      "y": 0,
+      "scale": 1.25,
+      "transform": 0,
+      "bitdepth": 8,
+      "cm": "srgb",
+      "sdr_brightness": 1,
+      "sdr_saturation": 1,
+      "sdr_min_luminance": 0.2,
+      "sdr_max_luminance": 80,
+      "min_luminance": 0
+    }
+  ],
+  "workspaces": {
+    "enabled": false,
+    "strategy": "sequential",
+    "max_workspaces": 9,
+    "group_size": 3,
+    "monitor_order": [
+      "au optronics|0xc199",
+      "samsung electric company|ls24d60xu|hnaxc00823"
+    ]
+  },
+  "exec": ""
+}

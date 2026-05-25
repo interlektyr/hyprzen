@@ -1,0 +1,17 @@
+[[plugin.deps]]
+use = "ndtoan96/ouch"
+rev = "406ce6c"
+hash = "f5afc904d5106ee368c8aa2ded43bd74"
+
+[[plugin.deps]]
+use = "stelcodes/bunny"
+rev = "71b14a3"
+hash = "18a2829738214fe9bca99a2fef19113d"
+
+[[plugin.deps]]
+use = "uhs-robert/recycle-bin"
+rev = "fa68711"
+hash = "8714306b5cac6359edbacbf545fbd691"
+
+[flavor]
+deps = []

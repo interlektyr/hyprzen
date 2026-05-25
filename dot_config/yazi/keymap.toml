@@ -1,0 +1,31 @@
+[[mgr.prepend_keymap]]
+on = ["C"]
+run = "plugin ouch"
+desc = "Compress with ouch"
+
+[[mgr.prepend_keymap]]
+on  = "<C-n>"
+run = "shell -- dragon-drop -x -i -T %h"
+
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi"
+on = ";"
+run = "plugin bunny"
+
+# Optionally, add another keymap to immediately fuzzy search bookmarks
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi fuzzy search"
+on = "'"
+run = "plugin bunny fuzzy"
+
+[[mgr.prepend_keymap]]
+on = ["R","b"]
+run = "plugin recycle-bin"              
+desc = "Open Recycle Bin menu"
+
+[[mgr.prepend_keymap]]
+on  = "<C-w>"
+run = "shell -- imv %d"
+desc = "Open directory with imv"
+
+

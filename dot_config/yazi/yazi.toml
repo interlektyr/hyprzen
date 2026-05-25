@@ -1,0 +1,18 @@
+[[plugin.prepend_previewers]]
+mime = "application/{*zip,tar,bzip2,7z*,rar,xz,zstd,java-archive}"
+run  = "ouch"
+
+[opener]
+play = [
+	{ run = "mpv %s", orphan = true, for = "unix" },
+]
+edit = [
+	{ run = "neovide %s", orphan = true, for = "unix" },
+]
+open = [
+	{ run = "xdg-open %s", desc = "Open" },
+]
+extract = [
+	{ run = 'ouch d -y "$@"', desc = "Extract here with ouch", for = "unix" }
+]
+# ...

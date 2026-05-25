@@ -1,0 +1,46 @@
+{
+  "1": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
+    "color": "#F5D098"
+  },
+  "2": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
+    "color": "#DBE6AF"
+  },
+  "3": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/3.jpg",
+    "color": "#CAE0A7"
+  },
+  "4": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/4.jpg",
+    "color": "#ADDEB9"
+  },
+  "5": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
+    "color": "#ACE0D4"
+  },
+  "6": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/6.jpg",
+    "color": "#AFDFE6"
+  },
+  "7": {
+    "img": "/home/kristian/Hyprland/backup/quickshell/assets/wallpapers/7.jpg",
+    "color": "#B2CFED"
+  },
+  "8": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/8.jpg",
+    "color": "#D0BBF0"
+  },
+  "9": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/9.jpg",
+    "color": "#F3C0E5"
+  },
+  "10": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
+    "color": "#F8F9E8"
+  },
+  "default": {
+    "img": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
+    "color": "#F5D098"
+  }
+}
