@@ -71,7 +71,12 @@ hl.window_rule({
 hl.layer_rule({
 	match = { namespace = "notifications" },
 	hl.animation(
-		{ leaf = "layersIn", enabled = true, speed = 2.5, bezier = "almostLinear", style = "slide" },
-		{ leaf = "layersOut", enabled = true, speed = 2.5, bezier = "almostLinear", style = "slide" }
+		{ leaf = "layersIn", enabled = true, speed = 1.5, bezier = "almostLinear", style = "slide" },
+		{ leaf = "layersOut", enabled = true, speed = 1.5, bezier = "almostLinear", style = "slide" }
 	),
+})
+
+hl.layer_rule({
+	match = { namespace = ".*hud.*" },
+	no_anim = true,
 })
