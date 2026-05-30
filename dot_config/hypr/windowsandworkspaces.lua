@@ -67,3 +67,11 @@ hl.window_rule({
 	float = true,
 	size = { "(monitor_w*0.75)", "(monitor_h*0.75)" },
 })
+
+hl.layer_rule({
+	match = { namespace = "notifications" },
+	hl.animation(
+		{ leaf = "layersIn", enabled = true, speed = 2.5, bezier = "almostLinear", style = "slide" },
+		{ leaf = "layersOut", enabled = true, speed = 2.5, bezier = "almostLinear", style = "slide" }
+	),
+})
