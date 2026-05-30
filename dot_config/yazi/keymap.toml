@@ -28,4 +28,15 @@ on  = "<C-w>"
 run = "shell -- imv %d"
 desc = "Open directory with imv"
 
+[[mgr.prepend_keymap]]
+on = "<C-Enter>"
+run = ["open", 'shell "ya emit close --no-cwd-file"']
+#run = [ "open", "quit" ]
+desc = "Open selected files and close"
+
+[[mgr.prepend_keymap]]
+on   = "F"
+run  = "plugin smart-filter"
+desc = "Smart filter"
+
 
