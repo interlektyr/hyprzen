@@ -39,29 +39,9 @@ Scope {
   }
   } 
 
-  //property var allApps: []
-
-  //Component.onCompleted: {
-  //  allApps = DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name, Qt.locale().name));
-  //}
-
-  //Connections {
-  //  target: DesktopEntries.applications
-  //    function onValuesChanged() {
-  //        allApps = DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name, Qt.locale().name));
-  //  }
-  //}
-
   function fuzzyMatch(needle, haystack) {
     return haystack.toLowerCase().includes(needle.toLowerCase());
   }
-
-  //function cleanExecString(execStr) {
-  //  if (!execStr) return ""; 
-  //  let cleaned = execStr.replace(/\s%[a-zA-Z]/g, "").trim();
-  //  cleaned = cleaned.replace(/['"]/g, "");
-  //  return cleaned;
-  //}
   
   signal closeStasherRequested()
 
@@ -72,7 +52,7 @@ Scope {
     color: "transparent" 
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "appcommander_hud"
+    WlrLayershell.namespace: "stasher_hud"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     WlrLayershell.exclusiveZone: -1
 

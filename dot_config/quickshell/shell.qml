@@ -91,7 +91,11 @@ ShellRoot {
     property bool showPowerMWidget: false
 
     //System Menu
-    property bool showSMWidget: false 
+    property bool showSMWidget: false
+
+    //Stasher
+
+    property bool showStasherWidget: false
 
     // GLOBALSHORTCUTS
     // WorkspaceWidget
@@ -162,6 +166,14 @@ ShellRoot {
         onPressed: { 
             root.showSMWidget = true;
         }
+    }
+
+    //Stasher
+    GlobalShortcut {
+      name: "stasher_hud"
+      onPressed: {
+        root.showStasherWidget = true;
+      }
     }
 
     // Where is my LockScreen
@@ -349,6 +361,13 @@ ShellRoot {
       source: "SystemMenu.qml" 
     } 
 
+    //Stasher
+    Loader {
+      id: stasherLoader
+      active: root.showStasherWidget
+      source: "Stasher.qml"
+    }
+
     // CONNECTIONS
     // workspaceLoader
     Connections {
@@ -429,6 +448,16 @@ ShellRoot {
 
       function onCloseSMRequested() {
         root.showSMWidget = false
+      }
+    }
+
+    //Stasher 
+    Connections {
+      target: stasherLoader.item
+      ignoreUnknownSignals: true 
+
+      function onCloseStasherRequested() {
+        root.showStasherWidget = false
       }
     }
 
