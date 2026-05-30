@@ -25,6 +25,10 @@ hl.config({
 		layout = "dwindle",
 	},
 
+	xwayland = {
+		force_zero_scaling = true,
+	},
+
 	decoration = {
 		rounding = 10,
 		rounding_power = 2,

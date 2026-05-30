@@ -58,7 +58,7 @@ hl.window_rule({
 	match = { class = "kitty", title = "yazi_filepicker" },
 	float = true,
 	size = { "(monitor_w*0.85)", "(monitor_h*0.85)" },
-	stay_focused = true,
+	--stay_focused = true,
 })
 
 hl.window_rule({

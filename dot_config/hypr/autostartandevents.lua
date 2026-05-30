@@ -9,6 +9,7 @@
 hl.on("hyprland.start", function()
 	hl.exec_cmd("udisks2 &")
 	hl.exec_cmd("udiskie &")
+	hl.exec_cmd("/usr/bin/dunst &")
 	hl.exec_cmd("awww-daemon &")
 	hl.exec_cmd("kitty --title dropdterm -e fish", { workspace = "special:terminal silent" })
 	hl.exec_cmd("zen-browser --start-fullscreen", { workspace = "special:zbrowser silent" })
