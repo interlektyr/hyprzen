@@ -18,7 +18,7 @@ pmpkg=(
   "uwsm"
   "hyprpicker"
   "wl-clipboard"
-  "mako"
+  "dunst"
   "gum"
   "git"
   "wget"
@@ -92,6 +92,7 @@ case $(gum choose --header="What kind of computer do you have?" "ASUS Laptop" "O
 esac
 
 #You need to create the file /etc/asusd/ manually
+#YOU NEED TO RENAME QUICKSHELL scrips and make them executable
 #You need to set Throttle Policy for power state to Balanced for both on Battery och on AC
 
 # if not on CachyOS:
@@ -100,13 +101,13 @@ esac
 # install arch-update
 # install starship (copy starship-conf)
 
-# sudo pacman -Syu --needed ${pmpkg[@]}
+sudo pacman -Syu --needed ${pmpkg[@]}
 paru -S --needed ${parpkg[@]}
 
-# ya pkg add ndtoan96/ouch
+ya pkg add ndtoan96/ouch
 
-# ya pkg add stelcodes/bunny
+ya pkg add stelcodes/bunny
 
-# ya pkg add uhs-robert/recycle-bin
+ya pkg add uhs-robert/recycle-bin
 
-# sudo curl -sL $(curl -s https://api.github.com/repos/5hubham5ingh/WallRizz/releases/latest | grep -Po '"browser_download_url": "\K[^"]+' | grep WallRizz) | tar -xz && sudo mv WallRizz /usr/bin/
+sudo curl -sL $(curl -s https://api.github.com/repos/5hubham5ingh/WallRizz/releases/latest | grep -Po '"browser_download_url": "\K[^"]+' | grep WallRizz) | tar -xz && sudo mv WallRizz /usr/bin/
