@@ -30,8 +30,10 @@ desc = "Open directory with imv"
 
 [[mgr.prepend_keymap]]
 on = "<C-Enter>"
-run = ["open", 'shell "ya emit close --no-cwd-file"']
+#run = ["open", 'shell "ya emit close --no-cwd-file"']
 #run = [ "open", "quit" ]
+#run = ["open", 'shell --orphan "/home/kristian/.config/quickshell/scripts/zen_terminal_wrapper.sh yazi_filepicker"']
+run = ["open", 'shell --orphan -- sleep 0.5 && hyprctl dispatch "hl.dsp.window.move({ workspace = \"special:stash\", follow  = false, window = \"title:yazi_filepicker\" })"']
 desc = "Open selected files and close"
 
 [[mgr.prepend_keymap]]
