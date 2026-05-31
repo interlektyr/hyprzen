@@ -9,7 +9,8 @@ local mainMod = "SUPER"
 ---Launch appcommander
 hl.bind(mainMod .. " + SPACE", hl.dsp.global("quickshell:appcommander_hud"))
 ---Launch yazi, floating
-hl.bind(mainMod .. " + CTRL + SPACE", hl.dsp.exec_cmd("kitty --title yazi_filepicker -e yazi"))
+--hl.bind(mainMod .. " + CTRL + SPACE", hl.dsp.exec_cmd("kitty --title yazi_filepicker -e yazi"))
+hl.bind(mainMod .. " + CTRL + SPACE", hl.dsp.exec_cmd("~/.config/hypr/zen_yazi_filepicker.sh"))
 ---Show clock
 hl.bind(mainMod .. " + ALT + RETURN", hl.dsp.global("quickshell:clock_hud"))
 ---Show zen-browser drop-down
