@@ -1,7 +1,7 @@
 {
   "name": "home_office",
-  "created_at": "2026-05-25T15:59:31.139880906Z",
-  "updated_at": "2026-05-25T15:59:31.140064422Z",
+  "created_at": "2026-06-01T21:18:57.837681465Z",
+  "updated_at": "2026-06-01T21:18:57.83876893Z",
   "outputs": [
     {
       "key": "samsung electric company|ls24d60xu|hnaxc00823",
@@ -17,7 +17,7 @@
       "refresh": 59.95,
       "x": 2048,
       "y": 0,
-      "scale": 1.07,
+      "scale": 1,
       "transform": 0,
       "bitdepth": 8,
       "cm": "srgb",
@@ -34,10 +34,10 @@
       "make": "AU Optronics",
       "model": "0xC199",
       "enabled": false,
-      "mode": "2560x1600@165.04Hz",
+      "mode": "2560x1600@60.03Hz",
       "width": 2560,
       "height": 1600,
-      "refresh": 165.04,
+      "refresh": 60.03,
       "x": 0,
       "y": 0,
       "scale": 1.25,
