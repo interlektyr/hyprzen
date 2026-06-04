@@ -24,8 +24,8 @@ Scope {
  
   PanelWindow {
     id: hud
-    implicitWidth: 300    
-    implicitHeight: 300
+    implicitWidth: 350    
+    implicitHeight: 400
     color: "transparent"
     anchors.top: true
     margins.top: 30
@@ -34,7 +34,8 @@ Scope {
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "notificationWidget_hud"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None 
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    //WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.exclusiveZone: -1
     visible: content.opacity > 0
      
@@ -55,33 +56,45 @@ Scope {
         delegate: Rectangle {
           id: noteDelegate
           width: noteList.width
-          height: 50
-          color: "red"
+          height: noteDelegate.isSelected ? contentColumn.implicitHeight + 20 : 50
+          color: noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
+          //visible: noteDelegate.isSelected
+          //opacity: noteDelegate.isSelected ? 1 : 0.7
+          radius: 12
 
           readonly property bool isSelected: ListView.isCurrentItem
  
           Column {
+            id: contentColumn
             anchors.centerIn: parent
             width: parent.width - 20
             anchors.leftMargin: 2
             spacing: 2
 
             Text {
+              width: parent.width
               text: modelData.summary
-              color: "white"
-              font.pixelSize: 11
-              font.family: "DepartureMono Nerd Font Mono"
+              color: "black"
+              font.pixelSize: 20
+              font.family: "Work Sans"
+              font.weight: Font.Bold
+              font.capitalization: Font.AllLowercase
               verticalAlignment: Text.AlignVCenter
-              //height: parent.height
+              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
+              //visible: noteDelegate.isSelected Text.NoWrap 
             }
 
             Text {
+              width: parent.width
               text: modelData.body
-              color: "white"
-              font.pixelSize: 11
+              color: "black"
+              font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
-              //height: parent.height
+              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
+              //visible: noteDelegate.isSelected
             }
           } 
         }
