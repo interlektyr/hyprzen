@@ -15,6 +15,9 @@ Scope {
   //    hideTimer.restart();
   //}
 
+  signal closeNoteWidgetRequested()
+  property bool passiveWidget: true
+
   property var noteModel: [
     { summary: "test", body: "This is a test notification dummy" },
     { summary: "another test", body: "This is an additional notification dummy" },
@@ -34,10 +37,10 @@ Scope {
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "notificationWidget_hud"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: root.passiveWidget ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
     //WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.exclusiveZone: -1
-    visible: content.opacity > 0
+    visible: content.opacity > 0  
      
     Rectangle {
       id: content
@@ -48,10 +51,11 @@ Scope {
       ListView {
         id: noteList
         anchors.fill: parent 
-        model: noteModel 
+        //model: noteModel
+        model: NotificationList.history
         clip: true 
         focus: true
-        spacing: 5
+        spacing: 6
 
         delegate: Rectangle {
           id: noteDelegate
@@ -60,9 +64,24 @@ Scope {
           color: noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
           //visible: noteDelegate.isSelected
           //opacity: noteDelegate.isSelected ? 1 : 0.7
-          radius: 12
+          radius: 12 
 
           readonly property bool isSelected: ListView.isCurrentItem
+
+          Keys.onEscapePressed: root.closeNoteWidgetRequested()
+
+
+          Text {
+            text: "1/1"
+            color: "black"
+            font.pixelSize: 14
+            font.family: "DepartureMono Nerd Font Mono"
+            anchors.top: parent.top
+            anchors.right: parent.right 
+            anchors.topMargin: 10
+            anchors.rightMargin: 10
+            visible: noteDelegate.isSelected 
+          } 
  
           Column {
             id: contentColumn
@@ -73,7 +92,7 @@ Scope {
 
             Text {
               width: parent.width
-              text: modelData.summary
+              text: summary
               color: "black"
               font.pixelSize: 20
               font.family: "Work Sans"
@@ -87,7 +106,7 @@ Scope {
 
             Text {
               width: parent.width
-              text: modelData.body
+              text: body
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
@@ -96,8 +115,21 @@ Scope {
               elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
               //visible: noteDelegate.isSelected
             }
+
+            Text {
+              text: "[\uf061] action"
+              color: "black"
+              font.pixelSize: 14
+              font.family: "DepartureMono Nerd Font Mono"
+              verticalAlignment: Text.AlignVCenter
+              visible: noteDelegate.isSelected
+            } 
           } 
         }
+
+        Component.onCompleted: console.log(noteListT.body);
+
+
       }
 
       

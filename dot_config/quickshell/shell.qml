@@ -2,6 +2,7 @@ import Quickshell
 import QtQuick
 import Quickshell.Hyprland
 import Quickshell.Io
+import Quickshell.Services.Notifications
 
 
 ShellRoot {
@@ -29,6 +30,11 @@ ShellRoot {
         //  Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "monitor"]);
         //}
       }
+    }
+
+    //NOTIFICATION SERVICE 
+    NotificationServer {
+      id: notifyService
     }
        
     // PROPERTIES
@@ -94,8 +100,11 @@ ShellRoot {
     property bool showSMWidget: false
 
     //Stasher
-
     property bool showStasherWidget: false
+
+    //NotificationWidget 
+    property bool showNoteWidget: false
+    property bool passiveNoteWidget: true
 
     // GLOBALSHORTCUTS
     // WorkspaceWidget
@@ -176,6 +185,16 @@ ShellRoot {
       }
     }
 
+    //NotificationWidget
+    GlobalShortcut {
+      name: "notificationWidget_hud"
+      onPressed: {
+        root.passiveNoteWidget = false;
+        autoCloseNoteWidgetTimer.stop();
+        root.showNoteWidget = true;
+      }
+    }
+
     // Where is my LockScreen
     GlobalShortcut {
         name: "lockTheScreen"
@@ -226,6 +245,18 @@ ShellRoot {
         onTriggered: {
           if (root.useVTimer) {
             root.showVolumeWidget = false;
+          }
+        }
+    }
+
+    // NotificationsWidget
+    Timer {
+        id: autoCloseNoteWidgetTimer
+        interval: 3000
+        running: false
+        onTriggered: {
+          if (root.passiveNoteWidget) {
+            root.showNoteWidget = false;
           }
         }
     }
@@ -296,20 +327,7 @@ ShellRoot {
       //active: true
       active: root.showWCIndicatorBool
       source: "WCIndicator.qml"
-
-      //Binding {
-      //  target: wcIndicatorLoader.item 
-      //  property: "currentWs"
-      //  value: root.activeWorkspace
-      //  when: wcIndicatorLoader.status === Loader.Ready
-      //}
-
-      //Binding { 
-      //  target: wcIndicatorLoader.item
-      //  property: "accentColor"
-      //  value: root.activeAccent
-      //  when: workspaceLoader.status === Loader.Ready
-      //}
+ 
       onLoaded: {
         if (item) {
           item.currentWs = Qt.binding(() => root.activeWorkspace);
@@ -367,6 +385,21 @@ ShellRoot {
       active: root.showStasherWidget
       source: "Stasher.qml"
     }
+
+    //NotificatonWidget
+    Loader {
+      id: noteWidgetLoader
+      active: root.showNoteWidget
+      source: "NotificationWidget.qml"
+
+      onLoaded: {
+        if (item) {
+          item.passiveWidget = Qt.binding(() => root.passiveNoteWidget);
+        }
+      }
+
+    }
+
 
     // CONNECTIONS
     // workspaceLoader
@@ -460,6 +493,27 @@ ShellRoot {
         root.showStasherWidget = false
       }
     }
+    
+    //Notification 
+    Connections {
+      target: notifyService 
+      function onNotification(n) {
+        NotificationList.add(n);
+        root.passiveNoteWidget = true
+        root.showNoteWidget = true;
+        autoCloseNoteWidgetTimer.restart();
+      }
+    }
+
+    Connections {
+      target: noteWidgetLoader.item
+      ignoreUnknownSignals: true 
+
+      function onCloseNoteWidgetRequested() {
+        root.showNoteWidget = false
+      }
+    }
+
 
     // IPC-Handlers
     //qs ipc call zen_shell setWCWidgetBG "/home/kristian/.config/hypr/wallpapers/3.jpg"
