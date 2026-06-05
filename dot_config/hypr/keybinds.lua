@@ -46,6 +46,8 @@ hl.bind(mainMod .. " + Control_R", hl.dsp.global("quickshell:workspace_hud"))
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.global("quickshell:lockTheScreen"))
 --Stasher
 hl.bind(mainMod .. " + H", hl.dsp.global("quickshell:stasher_hud"))
+--Notifications
+hl.bind(mainMod .. " + CTRL + N", hl.dsp.global("quickshell:notificationWidget_hud"))
 
 ---WINDOWS
 ---Focus follows mouse or move focus with mainMod + arrow keys
