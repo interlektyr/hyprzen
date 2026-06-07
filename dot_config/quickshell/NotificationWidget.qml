@@ -3,9 +3,14 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import QtQuick.Layouts
+import QtQml.Models
 
 Scope {
   id: root
+
+  Component.onDestruction: {
+    NotificationList.now.clear();
+  }
 
   //function triggerShow() {
     //showAnimation.restart();
@@ -23,7 +28,7 @@ Scope {
     { summary: "another test", body: "This is an additional notification dummy" },
     { summary: "another test", body: "This is an additional notification dummy" },
     { summary: "another test", body: "This is an additional notification dummy with a very long message" }
-  ]
+  ] 
  
   PanelWindow {
     id: hud
@@ -40,39 +45,51 @@ Scope {
     WlrLayershell.keyboardFocus: root.passiveWidget ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
     //WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.exclusiveZone: -1
-    visible: content.opacity > 0  
-     
+    //visible: content.opacity > 0
+  
     Rectangle {
       id: content
       anchors.fill: parent 
       color: "transparent"
-      opacity: 1
-
+      opacity: 1 
+ 
       ListView {
         id: noteList
         anchors.fill: parent 
-        //model: noteModel
-        model: NotificationList.history
+        model: {
+          if (root.passiveWidget) {
+            return NotificationList.now;
+          } else {
+            return NotificationList.history;
+          }
+        }  
         clip: true 
         focus: true
         spacing: 6
+        //snapMode: ListView.SnapToItem
+        //highlightRangeMode: ListView.ApplyRange
 
         delegate: Rectangle {
           id: noteDelegate
           width: noteList.width
-          height: noteDelegate.isSelected ? contentColumn.implicitHeight + 20 : 50
+          height: noteDelegate.isSelected || root.passiveWidget ? contentColumn.implicitHeight + 20 : 50
           color: noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
-          //visible: noteDelegate.isSelected
+          //visible: root.passiveWidget && !newnote ? false : true   
           //opacity: noteDelegate.isSelected ? 1 : 0.7
-          radius: 12 
+          radius: 12
 
           readonly property bool isSelected: ListView.isCurrentItem
 
-          Keys.onEscapePressed: root.closeNoteWidgetRequested()
-
+          Keys.onEscapePressed: { 
+            root.closeNoteWidgetRequested();
+          }
 
           Text {
-            text: "1/1"
+            //Använd detta för annan info, t.ex appname eller urgency
+            //Problem, om summary är för långt kommer den att överlappa denna, alternativ
+            //är att sätta width på summary som parent.width - (minus) ett värde som ungefär motsvarar
+            //denna och sätta att dden alltid ska ha elide 
+            text: "!" 
             color: "black"
             font.pixelSize: 14
             font.family: "DepartureMono Nerd Font Mono"
@@ -80,7 +97,7 @@ Scope {
             anchors.right: parent.right 
             anchors.topMargin: 10
             anchors.rightMargin: 10
-            visible: noteDelegate.isSelected 
+            visible: noteDelegate.isSelected || root.passiveWidget ? true : false 
           } 
  
           Column {
@@ -117,17 +134,17 @@ Scope {
             }
 
             Text {
-              text: "[\uf061] action"
+              text: !root.passiveWidget ? "[\uf061] action" : "action"
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
-              visible: noteDelegate.isSelected
+              visible: noteDelegate.isSelected || root.passiveWidget ? true : false
             } 
           } 
-        }
+        } //delgate
 
-        Component.onCompleted: console.log(noteListT.body);
+        //Component.onCompleted: console.log(noteListT.body);
 
 
       }

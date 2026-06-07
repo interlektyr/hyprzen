@@ -255,8 +255,8 @@ ShellRoot {
         interval: 3000
         running: false
         onTriggered: {
-          if (root.passiveNoteWidget) {
-            root.showNoteWidget = false;
+          if (root.passiveNoteWidget) {  
+            root.showNoteWidget = false; 
           }
         }
     }
