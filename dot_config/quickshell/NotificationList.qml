@@ -25,21 +25,22 @@ Singleton {
   }
 
   function addold(n) {
-    writeNote(notificationModel)
-    writeNote(rightNow)
+    writeNote(history)
+    writeNote(now)
   }
 
   function add(n) {
-    //notificationModel.insert(0, {
-    notificationModel.append({
+    notificationModel.insert(0, {
+    //notificationModel.append({
       "summary": n.summary,
       "body": n.body,
-      "newnote": true
+      "urgency": n.urgency
     })
-    rightNow.append({
+    rightNow.insert(0, {
+    //rightNow.append({
       "summary": n.summary,
       "body": n.body,
-      "newnote": true
+      "urgency": n.urgency
     })
   }
  

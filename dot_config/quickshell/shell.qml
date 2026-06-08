@@ -498,10 +498,14 @@ ShellRoot {
     Connections {
       target: notifyService 
       function onNotification(n) {
-        NotificationList.add(n);
-        root.passiveNoteWidget = true
-        root.showNoteWidget = true;
-        autoCloseNoteWidgetTimer.restart();
+        if (noteWidgetLoader.status == Loader.Ready && root.passiveNoteWidget == false) {
+           NotificationList.add(n);
+        } else {
+           NotificationList.add(n);
+           root.passiveNoteWidget = true
+           root.showNoteWidget = true;
+           autoCloseNoteWidgetTimer.restart();
+        }
       }
     }
 

@@ -32,8 +32,8 @@ Scope {
  
   PanelWindow {
     id: hud
-    implicitWidth: 350    
-    implicitHeight: 400
+    implicitWidth: 360    
+    implicitHeight: 810
     color: "transparent"
     anchors.top: true
     margins.top: 30
@@ -49,7 +49,7 @@ Scope {
   
     Rectangle {
       id: content
-      anchors.fill: parent 
+      anchors.fill: parent
       color: "transparent"
       opacity: 1 
  
@@ -60,7 +60,14 @@ Scope {
           if (root.passiveWidget) {
             return NotificationList.now;
           } else {
-            return NotificationList.history;
+            if (NotificationList.history.count === 0) {
+              let emptyNote = [
+                { summary: "no notifications", body: "There is no notifications to show. Either none has been send or all has been erased from history. Press [ESC] to exit" }
+              ];
+              return emptyNote;
+            } else {
+              return NotificationList.history;
+            }
           }
         }  
         clip: true 
@@ -68,15 +75,35 @@ Scope {
         spacing: 6
         //snapMode: ListView.SnapToItem
         //highlightRangeMode: ListView.ApplyRange
+        onCountChanged: noteList.currentIndex = 0
+ 
+        add: Transition {
+          NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
+          NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 300 }
+        }
+
+        displaced: Transition {
+         NumberAnimation { properties: "x,y"; duration: 400; easing.type: Easing.OutBounce }
+        }
 
         delegate: Rectangle {
           id: noteDelegate
           width: noteList.width
           height: noteDelegate.isSelected || root.passiveWidget ? contentColumn.implicitHeight + 20 : 50
-          color: noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
+          color: urgency == 2 ? "pink" : noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
           //visible: root.passiveWidget && !newnote ? false : true   
           //opacity: noteDelegate.isSelected ? 1 : 0.7
           radius: 12
+          opacity: visible ? 1 : 0
+          scale: visible ? 1 : 0
+          visible: false
+
+          Behavior on opacity { NumberAnimation { duration: 200 } }
+          Behavior on scale { NumberAnimation { duration: 600; easing.type: Easing.OutBounce; easing.amplitude: 0.2 } }
+
+          Component.onCompleted: {
+            noteDelegate.visible = true
+          }
 
           readonly property bool isSelected: ListView.isCurrentItem
 
@@ -84,12 +111,26 @@ Scope {
             root.closeNoteWidgetRequested();
           }
 
+          Keys.onPressed: (event) => {
+            if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
+              event.accepted = true;
+              NotificationList.history.clear();
+              root.closeNoteWidgetRequested();
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+              //event.accepted = true;
+              NotificationList.history.remove(noteList.currentIndex, 1);
+              if (NotificationList.history.count === 0) {
+                root.closeNoteWidgetRequested();
+              }
+            }           
+          }
+
           Text {
             //Använd detta för annan info, t.ex appname eller urgency
             //Problem, om summary är för långt kommer den att överlappa denna, alternativ
             //är att sätta width på summary som parent.width - (minus) ett värde som ungefär motsvarar
             //denna och sätta att dden alltid ska ha elide 
-            text: "!" 
+            text: urgency == 2 ? "!!!" : "!" 
             color: "black"
             font.pixelSize: 14
             font.family: "DepartureMono Nerd Font Mono"
@@ -105,11 +146,11 @@ Scope {
             anchors.centerIn: parent
             width: parent.width - 20
             anchors.leftMargin: 2
-            spacing: 2
+            spacing: 2 
 
             Text {
               width: parent.width
-              text: summary
+              text: NotificationList.history.count === 0 ? modelData.summary : summary
               color: "black"
               font.pixelSize: 20
               font.family: "Work Sans"
@@ -123,7 +164,7 @@ Scope {
 
             Text {
               width: parent.width
-              text: body
+              text: NotificationList.history.count === 0 ? modelData.body : body
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
@@ -134,7 +175,7 @@ Scope {
             }
 
             Text {
-              text: !root.passiveWidget ? "[\uf061] action" : "action"
+              text: !root.passiveWidget ? "<br>[\uf061] action" : "<br>action"
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
