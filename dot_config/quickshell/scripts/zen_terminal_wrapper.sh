@@ -133,3 +133,17 @@ if [[ $terminalOpt == "stasher" ]]; then
   hyprctl dispatch "hl.dsp.window.move({ workspace = \"$activ_ws\", window = \"address:$cmString\" })"
 
 fi
+
+# COMMANDS FOR NOTIFICATION WIDGET
+
+if [[ $terminalOpt == "toggledonotdisturbon" ]]; then
+
+  notify-send "Do not disturb: on" "The notification widget has been set to do not disturb. Notifications will not pop up on screen when sent, but they are still saved to history."
+
+fi
+
+if [[ $terminalOpt == "toggledonotdisturboff" ]]; then
+
+  notify-send "Do not disturb: off" "The do not disturb-mode has been toggled off. Notifications will pop up on screen when emitted."
+
+fi
