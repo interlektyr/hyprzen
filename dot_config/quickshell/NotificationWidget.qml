@@ -12,16 +12,10 @@ Scope {
     NotificationList.now.clear();
   }
 
-  //function triggerShow() {
-    //showAnimation.restart();
-  //    hud.visible = true;
-  //    if (showAnimation.running) showAnimation.stop();
-  //    content.opacity = 1.0;
-  //    hideTimer.restart();
-  //}
-
   signal closeNoteWidgetRequested()
+  signal doNotDisturb()
   property bool passiveWidget: true
+  property bool doNotDisturbSet: false
 
   property var noteModel: [
     { summary: "test", body: "This is a test notification dummy" },
@@ -46,6 +40,11 @@ Scope {
     //WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     WlrLayershell.exclusiveZone: -1
     //visible: content.opacity > 0
+
+    TapHandler {
+      onTapped:
+      root.closeNoteWidgetRequested()
+    }
   
     Rectangle {
       id: content
@@ -75,8 +74,18 @@ Scope {
         spacing: 6
         //snapMode: ListView.SnapToItem
         //highlightRangeMode: ListView.ApplyRange
-        onCountChanged: noteList.currentIndex = 0
- 
+        
+        Timer {
+          id: animHandler
+          interval: 400
+          running: false
+          onTriggered: {
+            noteList.currentIndex = 0
+          }
+        }
+        
+        onCountChanged: animHandler.running = true
+
         add: Transition {
           NumberAnimation { property: "opacity"; from: 0; to: 1.0; duration: 400 }
           NumberAnimation { property: "scale"; from: 0; to: 1.0; duration: 300 }
@@ -122,6 +131,13 @@ Scope {
               if (NotificationList.history.count === 0) {
                 root.closeNoteWidgetRequested();
               }
+            } else if (event.key === Qt.Key_D) {
+              if (doNotDisturbSet == false) {
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "toggledonotdisturbon"]);
+              } else {
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "toggledonotdisturboff"]);
+              }
+              doNotDisturb();
             }           
           }
 
@@ -157,8 +173,8 @@ Scope {
               font.weight: Font.Bold
               font.capitalization: Font.AllLowercase
               verticalAlignment: Text.AlignVCenter
-              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
-              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
+              wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
               //visible: noteDelegate.isSelected Text.NoWrap 
             }
 
@@ -169,8 +185,8 @@ Scope {
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
-              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
-              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
+              wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
               //visible: noteDelegate.isSelected
             }
 

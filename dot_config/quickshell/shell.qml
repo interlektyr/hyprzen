@@ -105,6 +105,7 @@ ShellRoot {
     //NotificationWidget 
     property bool showNoteWidget: false
     property bool passiveNoteWidget: true
+    property bool setDoNotDisturbNote: false
 
     // GLOBALSHORTCUTS
     // WorkspaceWidget
@@ -395,6 +396,7 @@ ShellRoot {
       onLoaded: {
         if (item) {
           item.passiveWidget = Qt.binding(() => root.passiveNoteWidget);
+          item.doNotDisturbSet = Qt.binding(() => root.setDoNotDisturbNote);
         }
       }
 
@@ -502,9 +504,11 @@ ShellRoot {
            NotificationList.add(n);
         } else {
            NotificationList.add(n);
-           root.passiveNoteWidget = true
-           root.showNoteWidget = true;
-           autoCloseNoteWidgetTimer.restart();
+           if (root.setDoNotDisturbNote == false) {
+             root.passiveNoteWidget = true
+             root.showNoteWidget = true;
+             autoCloseNoteWidgetTimer.restart();
+           }
         }
       }
     }
@@ -515,6 +519,14 @@ ShellRoot {
 
       function onCloseNoteWidgetRequested() {
         root.showNoteWidget = false
+      }
+
+      function onDoNotDisturb() {
+        if (root.setDoNotDisturbNote == false) {
+          root.setDoNotDisturbNote = true;
+        } else {
+          root.setDoNotDisturbNote = false
+        }
       }
     }
 

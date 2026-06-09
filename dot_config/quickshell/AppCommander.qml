@@ -123,6 +123,7 @@ Scope {
         spacing: 2 
         //anchors.margins: 10
 
+        
         ColumnLayout {
           Layout.preferredWidth: parent.width / 2 
           Layout.fillHeight: true
