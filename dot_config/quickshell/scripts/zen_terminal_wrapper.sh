@@ -4,6 +4,49 @@ terminalOpt=$1
 cmString=$2
 cmStringArg=$3
 
+get_connections() {
+
+  # Initiera variabler
+  wifi="disconnected"
+  ssid=""
+  ethernet="disconnected"
+  wireguard="disconnected"
+
+  # Läs av nmcli i "terse"-format (enhet:typ:status:anslutning)
+  while IFS=: read -r dev type state conn; do
+    case "$type" in
+    "wifi")
+      wifi="$state"
+      if [ "$state" = "connected" ]; then
+        ssid="$conn"
+      fi
+      ;;
+    "ethernet")
+      # Om du har flera ethernet-portar sparar vi den som faktiskt är igång
+      if [ "$state" = "connected" ] || [ "$ethernet" != "connected" ]; then
+        ethernet="$state"
+      fi
+      ;;
+    "wireguard")
+      if [ "$state" = "connected" ] || [ "$wireguard" != "connected" ]; then
+        wireguard="$state"
+      fi
+      ;;
+    esac
+  done < <(nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device)
+
+  # Returnera som ett rent JSON-objekt för QML
+  cat <<EOF
+{
+  "wifi": "$wifi",
+  "ssid": "$ssid",
+  "ethernet": "$ethernet",
+  "wireguard": "$wireguard"
+}
+EOF
+
+}
+
 #COMMANDS FOR APPCOMMANDER
 
 if [[ $terminalOpt == "kitty" ]]; then
@@ -145,5 +188,13 @@ fi
 if [[ $terminalOpt == "toggledonotdisturboff" ]]; then
 
   notify-send "Do not disturb: off" "The do not disturb-mode has been toggled off. Notifications will pop up on screen when emitted."
+
+fi
+
+# COMMANDS FOR CONNECTION WIDGET
+
+if [[ $terminalOpt == "getconnections" ]]; then
+
+  get_connections
 
 fi
