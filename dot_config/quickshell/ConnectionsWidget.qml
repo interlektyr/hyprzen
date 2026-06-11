@@ -12,10 +12,15 @@ Scope {
   
   signal closeTestRequested()
 
+  property string access: "ONLINE"
   property string wifi: "unknown"
   property string ssid: ""
+  property string wifiIp: ""
+  property string eto: ""
   property string ethernet: "unknown"
-  property string wireguard: "unknown"
+  property string ethernetIp: ""
+  property string wireguard: "DISABLED"
+  property string fw: "DOWN"
 
   Process {
     id: networkProcess
@@ -24,11 +29,16 @@ Scope {
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
-          let d = JSON.parse(data);
+         let d = JSON.parse(data);
+          widgetRoot.access = d.access;
           widgetRoot.wifi = d.wifi;
           widgetRoot.ssid = d.ssid;
+          widgetRoot.wifiIp = d.wifi_ip;
+          widgetRoot.eto = d.eto;
           widgetRoot.ethernet = d.ethernet;
+          widgetRoot.ethernetIp = d.ethernet_ip;
           widgetRoot.wireguard = d.wireguard;
+          widgetRoot.fw = d.fw;
       }
     }
   }
@@ -63,8 +73,8 @@ Scope {
 
     Rectangle {
       id: topRec 
-      width: 500 
-      height: 1000
+      width: 1000 
+      height: 500
       color: "#F8F9E8"
       anchors.centerIn: parent
       //anchors.horizontalCenter: parent.horizontalCenter
@@ -108,7 +118,7 @@ Scope {
 
 
       Text {
-        text: wifi + ": " + ssid
+        text: access + ", WIFI: " + wifi + " (" + ssid + "). WIRED:" + ethernet 
         //text: "[\uf062/\uf063] navigation [enter] launch [esc] quit"
         color: "#1e2528"
         font.pixelSize: 15
@@ -129,18 +139,20 @@ Scope {
       ListView {
         id: optionList
         anchors.centerIn: parent
-        width: 300; height: 610
+        width: 610; height: 300
         spacing: 2
         focus: true
         //orientation: ListView.Horizontal
         model: [
           { type: "internet", state: widgetRoot.wifi },
           { type: "firewall", state: widgetRoot.ethernet },
-          { type: "vpn", state: widgetRoot.wireguard }
+          { type: "vpn", state: widgetRoot.wireguard },
+          { type: "bluetooth", state: "inactive" },
+          { type: "torrents", state: "inactive" }
         ]
         delegate: Rectangle {
           id: listDelegate 
-          width: 300; height: 200
+          width: 600; height: 60
           border.width: 1
           color: "black"
           radius: 12
@@ -148,9 +160,26 @@ Scope {
           readonly property bool isSelected: ListView.isCurrentItem
 
           Text {
+            font.pixelSize: 20
+            font.family: "Work Sans"
+            font.weight: Font.ExtraBold
             color: listDelegate.isSelected ? "pink" : "white"
-            anchors.centerIn: parent
-            text: modelData.type + ": " + modelData.state
+            anchors.top: parent.top
+            anchors.topMargin: 2 
+            anchors.rightMargin: 5 
+            anchors.right: parent.right
+            text: modelData.type
+          }
+
+          Text {
+            font.pixelSize: 15
+            font.family: "DepartureMono Nerd Font Mono"
+            color: "white"
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 2 
+            anchors.leftMargin: 5 
+            anchors.left: parent.left
+            text: modelData.state
           }
         }
       }
