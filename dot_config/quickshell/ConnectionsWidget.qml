@@ -73,7 +73,7 @@ Scope {
 
     Rectangle {
       id: topRec 
-      width: 1000 
+      width: 800 
       height: 500
       color: "#F8F9E8"
       anchors.centerIn: parent
@@ -137,27 +137,69 @@ Scope {
 
       //Rimligtvis om du vill byta till ListView är att det är Row som byts ut till detta 
       ListView {
+
+        function internetText() {
+          var output = "Error";
+          if (widgetRoot.access == "OFFLINE") {
+            output = "OFFLINE"
+            return output
+          } else if (widgetRoot.wifi == "connected" && widgetRoot.ethernet != "connected") {
+            output = widgetRoot.access + " (WIFI " + widgetRoot.ssid + ": " + widgetRoot.wifiIp + ") "
+            return output
+          }  
+            return output
+        }
+
         id: optionList
         anchors.centerIn: parent
-        width: 610; height: 300
+        width: 680
+        height: 300
         spacing: 2
         focus: true
         //orientation: ListView.Horizontal
         model: [
-          { type: "internet", state: widgetRoot.wifi },
-          { type: "firewall", state: widgetRoot.ethernet },
+          { type: "internet", state: internetText() },
+          { type: "firewall", state: widgetRoot.fw + " (Uncomplicated Firewall) " },
           { type: "vpn", state: widgetRoot.wireguard },
           { type: "bluetooth", state: "inactive" },
           { type: "torrents", state: "inactive" }
         ]
-        delegate: Rectangle {
+        delegate: Item {
           id: listDelegate 
-          width: 600; height: 60
-          border.width: 1
-          color: "black"
-          radius: 12
+          height: 60
+          width: optionList.width
+          //border.width: 1
+          //color: "black"
+          //radius: 12
 
           readonly property bool isSelected: ListView.isCurrentItem
+
+          Row {
+            anchors.fill: parent
+            spacing: 1
+
+          Text {
+            width: 30
+            //Layout.fillWidth: true
+            //height: 60
+            //text: "\uf061"
+            text: ">"
+            font.pixelSize: 50
+            color: "red"
+            font.family: "DepartureMono Nerd Font Mono"
+            opacity: listDelegate.isSelected ? 1 : 0
+            //Layout.preferredWidth: 20
+            anchors.verticalCenter: parent.verticalCenter
+          }
+
+          Rectangle {
+            width: 600
+            //Layout.fillWidth: true
+            height: 60
+            color: "black"
+            radius: 12
+            //verticalAlignment: Qt.AlignVCenter
+            //anchors.verticalCenter: parent.verticalCenter
 
           Text {
             font.pixelSize: 20
@@ -181,6 +223,8 @@ Scope {
             anchors.left: parent.left
             text: modelData.state
           }
+        }
+        }
         }
       }
       //ColorAnimation on color { from: "black"; to: "blue"; duration: 2000 }
