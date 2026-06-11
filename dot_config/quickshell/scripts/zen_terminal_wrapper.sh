@@ -9,39 +9,65 @@ get_connections() {
   # Initiera variabler
   wifi="disconnected"
   ssid=""
+  wifi_ip=""
+  eto=""
   ethernet="disconnected"
-  wireguard="disconnected"
+  ethernet_ip=""
+  wireguard="DISABLED"
+  access="ONLINE"
+  fw="DOWN"
+
+  if [ "$(cat /etc/ufw/ufw.conf | grep ENABLED=yes)" = "ENABLED=yes" ]; then
+    fw="UP"
+  fi
 
   # Läs av nmcli i "terse"-format (enhet:typ:status:anslutning)
   while IFS=: read -r dev type state conn; do
+    current_ip=$(ip -4 addr show dev "$dev" 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -n1)
+    #clean_ip="${ip%/*}"
+
     case "$type" in
     "wifi")
       wifi="$state"
       if [ "$state" = "connected" ]; then
         ssid="$conn"
+        wifi_ip="$current_ip"
       fi
       ;;
     "ethernet")
       # Om du har flera ethernet-portar sparar vi den som faktiskt är igång
       if [ "$state" = "connected" ] || [ "$ethernet" != "connected" ]; then
         ethernet="$state"
+        if [ "$ethernet" = "connected" ]; then
+          eto="$conn"
+          ethernet_ip="$current_ip"
+        fi
       fi
       ;;
     "wireguard")
       if [ "$state" = "connected" ] || [ "$wireguard" != "connected" ]; then
-        wireguard="$state"
+        wireguard="ENABLED"
       fi
       ;;
     esac
   done < <(nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device)
 
+  if [ ethernet = "disconnected" ] && [ wifi = "disconnected" ]; then
+    access="OFFLINE"
+  fi
+
   # Returnera som ett rent JSON-objekt för QML
   cat <<EOF
 {
+  "access": "$access",
   "wifi": "$wifi",
   "ssid": "$ssid",
+  "wifi_ip": "$wifi_ip",
+  "eto": "$eto",
   "ethernet": "$ethernet",
-  "wireguard": "$wireguard"
+  "ethernet_ip": "$ethernet_ip",
+  "wireguard": "$wireguard",
+  "fw": "$fw"
 }
 EOF
 
