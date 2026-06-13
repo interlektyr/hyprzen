@@ -14,6 +14,8 @@ get_connections() {
   ethernet="disconnected"
   ethernet_ip=""
   wireguard="DISABLED"
+  wireguard_location=""
+  wireguard_ip=""
   access="ONLINE"
   fw="DOWN"
 
@@ -52,8 +54,13 @@ get_connections() {
     esac
   done < <(nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device)
 
-  if [ ethernet = "disconnected" ] && [ wifi = "disconnected" ]; then
+  if [ "$ethernet" = "disconnected" ] && [ "$wifi" = "disconnected" ]; then
     access="OFFLINE"
+  fi
+
+  if [ "$wireguard" = "ENABLED" ]; then
+    wireguard_location="$(mullvad status | awk '/Visible location: / {print $3 $4}')"
+    wireguard_ip="$(mullvad status | awk '/Visible location: / {print $6}')"
   fi
 
   # Returnera som ett rent JSON-objekt för QML
@@ -67,6 +74,8 @@ get_connections() {
   "ethernet": "$ethernet",
   "ethernet_ip": "$ethernet_ip",
   "wireguard": "$wireguard",
+  "wireguard_location": "$wireguard_location",
+  "wireguard_ip": "$wireguard_ip",
   "fw": "$fw"
 }
 EOF
