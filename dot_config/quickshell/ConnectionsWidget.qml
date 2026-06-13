@@ -23,6 +23,9 @@ Scope {
   property string wireguardLocation: ""
   property string wireguardIp: ""
   property string fw: "DOWN"
+  property string torrentServer: "NOT RUNNING"
+  property bool torrentDownloading: false
+  property bool torrentSeeding: false
 
   Process {
     id: networkProcess
@@ -43,6 +46,7 @@ Scope {
           widgetRoot.wireguardLocation = d.wireguard_location;
           widgetRoot.wireguardIp = d.wireguard_ip;
           widgetRoot.fw = d.fw;
+          widgetRoot.torrentServer = d.torrent_server;
       }
     }
   }
@@ -63,19 +67,19 @@ Scope {
     id: connectionOpt 
 
     property var connectionEntries: [
-      { title: "internet", desc: "run rate-mirrors" },         
-      { title: "firewall", desc: "run arch-update" },
-      { title: "vpn", desc: "launch moonbit" },
-      { title: "bluetooth", desc: "launch bottom" },
-      { title: "torrents", desc: "launch" }
+      { title: "internet", desc: "open nmtui" },         
+      { title: "firewall", desc: "open tufw" },
+      { title: "vpn", desc: "open mullvad-vpn" },
+      { title: "bluetooth", desc: "launch bluetooth" },
+      { title: "torrents", desc: torrentDesc() }
     ]
 
     property var connectionInfo: [
-      { title: "internet", state: internetText() },
-      { title: "firewall", state: widgetRoot.fw + "<br> Uncomplicated Firewall" },
-      { title: "vpn", state: vpnText() },
-      { title: "bluetooth", state: "inactive" },
-      { title: "torrents", state: "inactive" }
+      { title: "internet", state: internetText(), itemColor: internetColor() },
+      { title: "firewall", state: widgetRoot.fw + "<br> Uncomplicated Firewall", itemColor: firewallColor() },
+      { title: "vpn", state: vpnText(), itemColor: vpnColor() },
+      { title: "bluetooth", state: "inactive", itemColor: "white" },
+      { title: "torrents", state: widgetRoot.torrentServer + torrentText(), itemColor: "white" }
     ]
   }
 
@@ -87,10 +91,64 @@ Scope {
     return output
   }
 
+  function internetColor() {
+    var titleColor = "white"
+    if (widgetRoot.access == "ONLINE") {
+      titleColor = "#CAE0A7"
+    } else {
+      titleColor = "#F57F82"
+    }
+    return titleColor
+  }
+
+  function firewallColor() {
+    var titleColor = "white"
+    if (widgetRoot.fw == "UP") {
+      titleColor = "#CAE0A7"
+    } else {
+      titleColor = "#F57F82"
+    }
+    return titleColor
+  }
+
   function vpnText() {
     var output = "DISABLED"
     if (widgetRoot.wireguard == "ENABLED") {
       output = widgetRoot.wireguard + "<br>" + widgetRoot.wireguardLocation + "<br>" + widgetRoot.wireguardIp
+    }
+    return output
+  }
+
+  function vpnColor() {
+    var titleColor = "white"
+    if (widgetRoot.wireguard == "ENABLED") {
+      titleColor = "#CAE0A7"
+    } else {
+      titleColor = "#F57F82"
+    }
+    return titleColor
+  }
+
+  function torrentText() {
+    var output = "" 
+    if (widgetRoot.torrentServer == "RUNNING") {
+      if (widgetRoot.torrentDownloading && !widgetRoot.torrentSeeding) {
+        output = "<br> Downloading"
+      } else if (!widgetRoot.torrentDownloading && widgetRoot.torrentSeeding) {
+        output = "<br> Seeding" 
+      } else if (widgetRoot.torrentDownloading && widgetRoot.torrentSeeding) {
+        output = "<br> Downloading <br> Seeding"
+      } else if (!widgetRoot.torrentDownloading && !widgetRoot.torrentSeeding) {
+        output = "<br> Idle"
+      }
+    }
+    return output
+  }
+
+  function torrentDesc() {
+    var output = "start transmission and launch tremc"
+    if (widgetRoot.torrentServer == "RUNNING") {
+      output = "launch tremc or kill transmission"
     }
     return output
   }
@@ -208,13 +266,14 @@ Scope {
             //Component.onCompleted: forceActiveFocus()
             //onActiveFocusChanged: console.log("Focus: ", activeFocus)
             Keys.onPressed: (event) => {
+              //pkill -f -3 transmission-daemon för att stänga ner transmission
                 if (event.key === Qt.Key_Down) {
                   event.accepted = true;
                   if (optView.count > 0) {
                     optView.currentIndex = (optView.currentIndex + 1) % optView.count;
                     infoList.currentIndex = optView.currentIndex;
                   }
-                console.log("Ner");
+                //console.log("Ner");
               }
               else if (event.key === Qt.Key_Up) {
                 event.accepted = true;
@@ -260,7 +319,8 @@ Scope {
                 font.pixelSize: 20
                 font.family: "Work Sans"
                 font.weight: Font.ExtraBold
-                color: "white"
+                //color: "white"
+                color: modelData.itemColor 
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: 2 
@@ -304,8 +364,7 @@ Scope {
       }
 
       Text {
-        text: access + ", WIFI: " + wifi + " (" + ssid + "). WIRED:" + ethernet
-        //text: "[esc] quit"         
+        text: "[esc] quit [enter] " + connectionOpt.connectionEntries[optView.currentIndex].desc          
         //text: "[\uf062/\uf063] navigation [enter] launch [esc] quit"
         color: "#1e2528"
         font.pixelSize: 15
