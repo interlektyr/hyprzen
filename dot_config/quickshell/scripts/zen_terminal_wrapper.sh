@@ -18,6 +18,28 @@ get_connections() {
   wireguard_ip=""
   access="ONLINE"
   fw="DOWN"
+  torrent_server="NOT RUNNING"
+  torrent_downloading="false"
+  torrent_seeding="false"
+
+  if pgrep -x "transmission-da" >/dev/null; then
+    torrent_server="RUNNING"
+    summary=$(transmission-remote -l 2>/dev/null | tail -n 1)
+    if [ -n "$summary" ]; then
+      all_torrents=$(transmission-remote -l 2>/dev/null)
+      if echo "$all_torrents" | grep -q "Downloading"; then
+        torrent_downloading="true"
+      fi
+      up_speed=$(echo "$summary" | awk '{print $(NF-3)}')
+      down_speed=$(echo "$summary" | awk '{print $(NF-2)}')
+      if [ "$down_speed" != "0.0" ] && [ "$down_speed" != "None" ]; then
+        torrent_downloading="true"
+      fi
+      if [ "$up_speed" != "0.0" ] && [ "$up_speed" != "None" ]; then
+        torrent_seeding="true"
+      fi
+    fi
+  fi
 
   if [ "$(cat /etc/ufw/ufw.conf | grep ENABLED=yes)" = "ENABLED=yes" ]; then
     fw="UP"
@@ -76,7 +98,10 @@ get_connections() {
   "wireguard": "$wireguard",
   "wireguard_location": "$wireguard_location",
   "wireguard_ip": "$wireguard_ip",
-  "fw": "$fw"
+  "fw": "$fw",
+  "torrent_server": "$torrent_server",
+  "torrent_downloading": "$torrent_downloading",
+  "torrent_seeding": "$torrent_seeding"
 }
 EOF
 
