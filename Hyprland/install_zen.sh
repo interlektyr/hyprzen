@@ -49,6 +49,7 @@ pmpkg=(
   "hyprshot"
   "sddm"
   "awww"
+  "bluetui"
 )
 
 parpkg=(
