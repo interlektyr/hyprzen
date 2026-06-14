@@ -58,6 +58,7 @@ Scope {
         model: {
           if (root.passiveWidget) {
             return NotificationList.now;
+            //return NotificationList.rightNowList
           } else {
             if (NotificationList.history.count === 0) {
               let emptyNote = [
@@ -66,6 +67,7 @@ Scope {
               return emptyNote;
             } else {
               return NotificationList.history;
+              //return NotificationList.historyList
             }
           }
         }  
@@ -111,7 +113,8 @@ Scope {
           Behavior on scale { NumberAnimation { duration: 600; easing.type: Easing.OutBounce; easing.amplitude: 0.2 } }
 
           Component.onCompleted: {
-            noteDelegate.visible = true
+            noteDelegate.visible = true;
+            console.log(NotificationList.history.body);
           }
 
           readonly property bool isSelected: ListView.isCurrentItem
@@ -167,6 +170,7 @@ Scope {
             Text {
               width: parent.width
               text: NotificationList.history.count === 0 ? modelData.summary : summary
+              //text: modelData.summary
               color: "black"
               font.pixelSize: 20
               font.family: "Work Sans"
@@ -181,6 +185,7 @@ Scope {
             Text {
               width: parent.width
               text: NotificationList.history.count === 0 ? modelData.body : body
+              //text: modelData.body
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
@@ -190,6 +195,31 @@ Scope {
               //visible: noteDelegate.isSelected
             }
 
+            Column {
+              id: actionColumn
+              width: parent.width
+              spacing: 2
+              //visible: actions.length > 0
+              Rectangle { width: parent.width; height: 1; color: "black" }
+
+              property var currentItem: NotificationList.now.get(ListView.currentIndex)
+
+              visible: currentItem && currentItem.actionTextStr !== ""
+
+              Repeater {
+                model: parent.currentItem ? parent.currentItem.actionTextStr.split(";") : []
+
+                delegate: Text {
+                  text: modelData 
+                  //text: "actions: " + modelData
+                  //text: "test"
+                  color: "black"
+                  font.pixelSize: 14
+                }
+              }
+            }
+
+
             Text {
               text: !root.passiveWidget ? "<br>[\uf061] action" : "<br>action"
               color: "black"
@@ -198,7 +228,8 @@ Scope {
               verticalAlignment: Text.AlignVCenter
               visible: noteDelegate.isSelected || root.passiveWidget ? true : false
             } 
-          } 
+          } //Column one
+
         } //delgate
 
         //Component.onCompleted: console.log(noteListT.body);

@@ -30,17 +30,26 @@ Singleton {
   }
 
   function add(n) {
+    let texts = [];
+
+    for (let i = 0; i < n.actions.length; i++) {
+      texts.push(n.actions[i].text);
+    }
+
     notificationModel.insert(0, {
     //notificationModel.append({
       "summary": n.summary,
       "body": n.body,
-      "urgency": n.urgency
+      "urgency": n.urgency,
+      "actionTextStr": texts.join(";")
     })
+
     rightNow.insert(0, {
     //rightNow.append({
       "summary": n.summary,
       "body": n.body,
-      "urgency": n.urgency
+      "urgency": n.urgency,
+      "actionTextStr": texts.join(";")
     })
   }
  
