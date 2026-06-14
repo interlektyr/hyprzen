@@ -26,6 +26,10 @@ Scope {
   property string torrentServer: "NOT RUNNING"
   property bool torrentDownloading: false
   property bool torrentSeeding: false
+  property string bluetoothPower: "OFF"
+  property var bluetoothDevices: [] 
+
+  property string terminalOpt: "kitty"
 
   Process {
     id: networkProcess
@@ -47,6 +51,8 @@ Scope {
           widgetRoot.wireguardIp = d.wireguard_ip;
           widgetRoot.fw = d.fw;
           widgetRoot.torrentServer = d.torrent_server;
+          widgetRoot.bluetoothPower = d.bluetooth_power;
+          widgetRoot.bluetoothDevices = d.bluetooth_devices;
       }
     }
   }
@@ -70,7 +76,7 @@ Scope {
       { title: "internet", desc: "open nmtui" },         
       { title: "firewall", desc: "open tufw" },
       { title: "vpn", desc: "open mullvad-vpn" },
-      { title: "bluetooth", desc: "launch bluetooth" },
+      { title: "bluetooth", desc: "open bluetui" },
       { title: "torrents", desc: torrentDesc() }
     ]
 
@@ -78,8 +84,8 @@ Scope {
       { title: "internet", state: internetText(), itemColor: internetColor() },
       { title: "firewall", state: widgetRoot.fw + "<br> Uncomplicated Firewall", itemColor: firewallColor() },
       { title: "vpn", state: vpnText(), itemColor: vpnColor() },
-      { title: "bluetooth", state: "inactive", itemColor: "white" },
-      { title: "torrents", state: widgetRoot.torrentServer + torrentText(), itemColor: "white" }
+      { title: "bluetooth", state: widgetRoot.bluetoothPower + bluetoothText(), itemColor: bluetoothColor() },
+      { title: "torrents", state: widgetRoot.torrentServer + torrentText(), itemColor: torrentColor() }
     ]
   }
 
@@ -92,7 +98,7 @@ Scope {
   }
 
   function internetColor() {
-    var titleColor = "white"
+    var titleColor = "#272E33"
     if (widgetRoot.access == "ONLINE") {
       titleColor = "#CAE0A7"
     } else {
@@ -102,7 +108,7 @@ Scope {
   }
 
   function firewallColor() {
-    var titleColor = "white"
+    var titleColor = "#272E33"
     if (widgetRoot.fw == "UP") {
       titleColor = "#CAE0A7"
     } else {
@@ -120,7 +126,7 @@ Scope {
   }
 
   function vpnColor() {
-    var titleColor = "white"
+    var titleColor = "#272E33"
     if (widgetRoot.wireguard == "ENABLED") {
       titleColor = "#CAE0A7"
     } else {
@@ -145,10 +151,38 @@ Scope {
     return output
   }
 
-  function torrentDesc() {
-    var output = "start transmission and launch tremc"
+  function torrentColor() {
+    var titleColor = "#272E33"
     if (widgetRoot.torrentServer == "RUNNING") {
-      output = "launch tremc or kill transmission"
+      titleColor = "#CAE0A7"
+    } 
+    return titleColor
+  }
+
+  function bluetoothText() {
+    var output = ""
+    if (widgetRoot.bluetoothPower === "ON") {
+      if (widgetRoot.bluetoothDevices.length > 0) {
+        var output = "<br>" + widgetRoot.bluetoothDevices.join("\n");
+      } else if (widgetRoot.bluetoothDevices.length == 0) {
+        var output = "<br> No connected devices";
+      }
+    }    
+    return output;
+  }
+
+  function bluetoothColor() {
+    var titleColor = "#272E33"
+    if (widgetRoot.bluetoothPower == "ON") {
+      titleColor = "#CAE0A7"
+    } 
+    return titleColor
+  }
+
+  function torrentDesc() {
+    var output = "launch transmission and open tremc"
+    if (widgetRoot.torrentServer == "RUNNING") {
+      output = "open tremc or kill transmission"
     }
     return output
   }
@@ -171,8 +205,8 @@ Scope {
 
     Rectangle {
       id: conRec 
-      width: 800 
-      height: 500
+      width: 700 
+      height: 400
       color: "#F8F9E8"
       anchors.centerIn: parent
       //anchors.horizontalCenter: parent.horizontalCenter
@@ -283,6 +317,9 @@ Scope {
                 }
                 //console.log("Up");
               }
+              else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", widgetRoot.terminalOpt, "zen_connection_launch", optView.currentIndex]);
+              }
             }
           } //ListView
         }
@@ -315,16 +352,28 @@ Scope {
 
               readonly property bool isSelected: ListView.isCurrentItem
 
+              Rectangle {
+                id: indicatorRec 
+                width: 10
+                height: 10
+                color: modelData.itemColor
+                radius: indicatorRec.width / 2
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: 2
+                anchors.rightMargin: 5
+              }
+
               Text {
                 font.pixelSize: 20
                 font.family: "Work Sans"
                 font.weight: Font.ExtraBold
                 //color: "white"
-                color: modelData.itemColor 
+                color: "white" 
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: 2 
-                anchors.rightMargin: 5
+                anchors.rightMargin: indicatorRec.radius + indicatorRec.anchors.rightMargin + 7
                 text: modelData.title
               }
 
