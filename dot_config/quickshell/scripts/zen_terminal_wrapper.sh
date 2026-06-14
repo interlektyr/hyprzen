@@ -21,6 +21,18 @@ get_connections() {
   torrent_server="NOT RUNNING"
   torrent_downloading="false"
   torrent_seeding="false"
+  bluetooth_power="OFF"
+  bluetooth_devices="[]"
+
+  if bluetoothctl show | grep -q "Powered: yes"; then
+    bluetooth_power="ON"
+
+    device_list=$(bluetoothctl devices Connected | cut -d' ' -f3- | sed 's/"/\\"/g' | awk '{print "\""$0"\""}' | paste -sd, -)
+
+    if [ -n "$device_list" ]; then
+      bluetooth_devices="[$device_list]"
+    fi
+  fi
 
   if pgrep -x "transmission-da" >/dev/null; then
     torrent_server="RUNNING"
@@ -101,7 +113,9 @@ get_connections() {
   "fw": "$fw",
   "torrent_server": "$torrent_server",
   "torrent_downloading": "$torrent_downloading",
-  "torrent_seeding": "$torrent_seeding"
+  "torrent_seeding": "$torrent_seeding",
+  "bluetooth_power": "$bluetooth_power",
+  "bluetooth_devices": $bluetooth_devices
 }
 EOF
 
@@ -114,6 +128,26 @@ if [[ $terminalOpt == "kitty" ]]; then
   if [[ $cmString == "zen_mirrors" ]]; then
 
     kitty --title yazi -e ~/.config/quickshell/scripts/zen_power_menu_wrapper.sh mirrors
+    exit
+
+  fi
+
+  if [[ $cmString == "zen_connection_launch" ]]; then
+
+    case $cmStringArg in
+    0)
+      kitty --title yazi -e nmtui
+      ;;
+    1)
+      kitty --title yazi -e sudo tufw
+      ;;
+    2)
+      mullvad-vpn
+      ;;
+    3)
+      kitty --title yazi -e bluetui
+      ;;
+    esac
     exit
 
   fi
