@@ -33,7 +33,8 @@ Singleton {
     let texts = [];
 
     for (let i = 0; i < n.actions.length; i++) {
-      texts.push(n.actions[i].text);
+      // tidigare version så var push endast n.actions[i].text
+      texts.push("[" + i + "] " + n.actions[i].text + "<br>");
     }
 
     notificationModel.insert(0, {
@@ -41,7 +42,8 @@ Singleton {
       "summary": n.summary,
       "body": n.body,
       "urgency": n.urgency,
-      "actionTextStr": texts.join(";")
+      //i tidigare version var det texts.join(";")
+      "actionTextStr": texts.join(" ")
     })
 
     rightNow.insert(0, {
@@ -49,7 +51,7 @@ Singleton {
       "summary": n.summary,
       "body": n.body,
       "urgency": n.urgency,
-      "actionTextStr": texts.join(";")
+      "actionTextStr": texts.join(" ")
     })
   }
  

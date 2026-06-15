@@ -195,39 +195,56 @@ Scope {
               //visible: noteDelegate.isSelected
             }
 
-            Column {
-              id: actionColumn
-              width: parent.width
-              spacing: 2
+            //Column {
+            //  id: actionColumn
+            //  width: parent.width
+            //  spacing: 2
               //visible: actions.length > 0
-              Rectangle { width: parent.width; height: 1; color: "black" }
+            //  Rectangle { width: parent.width; height: 1; color: "black" }
 
-              property var currentItem: NotificationList.now.get(ListView.currentIndex)
+            //  property var currentItem: {
 
-              visible: currentItem && currentItem.actionTextStr !== ""
+            //    if (root.passiveWidget) {
+            //      return NotificationList.now.get(ListView.currentIndex); 
+            //    } else {
+            //      return NotificationList.history.get(ListView.currentIndex); 
+            //    }
+            //  }
 
-              Repeater {
-                model: parent.currentItem ? parent.currentItem.actionTextStr.split(";") : []
+            //  visible: currentItem && currentItem.actionTextStr !== ""
 
-                delegate: Text {
-                  text: modelData 
+            //  Repeater {
+            //    model: parent.currentItem ? parent.currentItem.actionTextStr.split(";") : []
+
+            //    delegate: Text {
+            //      text: modelData 
                   //text: "actions: " + modelData
                   //text: "test"
-                  color: "black"
-                  font.pixelSize: 14
-                }
-              }
-            }
-
+            //      color: "black"
+            //      font.pixelSize: 14
+            //    }
+            //  }
+            //}
 
             Text {
-              text: !root.passiveWidget ? "<br>[\uf061] action" : "<br>action"
+              text: {
+                let output = ""
+                if (actionTextStr !== "") {
+                  if (!root.passiveWidget) {
+                    output = "<br>" + actionTextStr.split(",")
+                  } else {
+                    return "<br> Actions available"
+                  }
+                }
+                return output
+              }
+              //text: !root.passiveWidget ? "<br>" + actionTextStr.split(",") : "<br> Actons available"
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
               visible: noteDelegate.isSelected || root.passiveWidget ? true : false
-            } 
+            }
           } //Column one
 
         } //delgate
