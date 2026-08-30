@@ -1,0 +1,95 @@
+#!/bin/bash
+
+arga=$1
+argb=$2
+argc=$3
+file="zen_settings.json"
+
+# Create the config file if it dosent exist
+#if [ ! -f "$file" ] || [ ! -s "$file" ]; then
+#  echo '{"dw": {}}' >"$file"
+#fi
+
+min_wc() {
+
+  if [ -z "$argb" ]; then
+    echo "Error: You must give a positive integer as your second argument. Example: zenctrl min_wc 4"
+    exit 1
+  fi
+
+  if ! [[ "$argb" =~ ^[0-9]+$ ]]; then
+    echo "Error: The second argument must be a positive integer. Example: zenctrl min_wc 4"
+    exit 1
+  fi
+
+  # Update no of .dw entries
+  updated_file=$(jq --arg max_str "$argb" '
+  ($max_str | tonumber) as $max |
+  (.dw // {}) as $org |
+  .dw = (
+    [ range(1; $max + 1) ] | 
+    reduce .[] as $i ({}; 
+      ($i | tostring) as $idx | 
+      .[$idx] = ($org[$idx] // "zen_default_bg.jpg")
+    )
+  )
+' "$file")
+
+  # Save back to original file, but only if the operation is successfull
+  if [ $? -eq 0 ] && [ ! -z "$updated_file" ]; then
+    echo "$updated_file" >"$file"
+    echo "Done! settings.json has been uppdated."
+  else
+    echo "An error occured i jq. settings.json has not been updated."
+  fi
+
+  exit
+
+}
+
+update_value() {
+  # $1 is key and $2 is value
+  local key="$1"
+  local n_value="$2"
+  jq --arg find_key "$key" --arg new_value "$n_value" '.[$find_key] = $new_value' "$file" >temp.json && mv temp.json "$file"
+}
+
+update_bool() {
+  local bool_key="$1"
+  local n_bool="$2"
+  jq --arg find_bool_key "$bool_key" --argjson new_bool "$n_bool" '.[$find_bool_key] = $new_bool' "$file" >temp.json && mv temp.json "$file"
+}
+
+if [[ $arga == "enable_dw" ]]; then
+  update_bool "enable_dw" "true"
+  echo "Done! Zenshells dynamic wallpaper-feature is ENABLED!"
+  exit
+fi
+
+if [[ $arga == "disable_dw" ]]; then
+  update_bool "enable_dw" "false"
+  echo "Done! Zenshells dynamic wallpaper-feature is DISABLED!"
+  exit
+fi
+
+if [[ $arga == "min_wc" ]]; then
+  min_wc
+fi
+
+if [[ $arga == "launch_term" ]]; then
+  read l_term
+
+  if [ -z "$l_term" ]; then
+    echo "Error: No new terminal launch argument given, exiting..."
+    exit 1
+  fi
+
+  update_value "launch_term" "$l_term"
+  #jq --arg new_value "$l_term" '.launch_term = $new_value' "$file" >temp.json && mv temp.json "$file"
+  echo "Done! Updated zenshells terminal launch argument to: $l_term"
+  exit
+fi
+
+echo ""
+echo "zenctrl - CLI-tool for the zenshell"
+exit

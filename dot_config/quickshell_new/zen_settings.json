@@ -1,0 +1,16 @@
+{
+  "enable_dw": true,
+  "dw": {
+    "1": "zen_default_bg.jpg",
+    "2": "zen_default_bg.jpg",
+    "3": "zen_default_bg.jpg",
+    "4": "zen_default_bg.jpg",
+    "5": "zen_default_bg.jpg",
+    "6": "zen_default_bg.jpg",
+    "7": "zen_default_bg.jpg",
+    "8": "zen_default_bg.jpg",
+    "9": "zen_default_bg.jpg",
+    "10": "zen_default_bg.jpg"
+  },
+  "launch_term": "kitty -e"
+}
