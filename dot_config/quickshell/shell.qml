@@ -550,7 +550,7 @@ ShellRoot {
 
 
     //NotificationWidget {}
-    ClockWidget_V2 {}
+    //ClockWidget_V2 {}
     Polkit {}
 }
 

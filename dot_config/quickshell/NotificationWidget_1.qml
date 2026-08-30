@@ -54,10 +54,11 @@ Scope {
   PanelWindow {
     id: hud
     implicitWidth: 360    
-    implicitHeight: 810
+    implicitHeight: Screen.height - 35
+    //810
     color: "transparent"
     anchors.top: true
-    margins.top: 45
+    margins.top: 5
     anchors.right: true
     margins.right: 6
     //anchors.left: true
@@ -75,11 +76,58 @@ Scope {
       onTapped:
       //root.closeNoteWidgetRequested()
       root.passiveWidget = true
-    } 
+    }
+
+    Column {
+      id: widgetCol
+      anchors.fill: parent 
+      //color: "transparent"
+      spacing: 5
+
+      Row {
+        id: topRow
+        width: hud.width
+        height: 35
+        layoutDirection: Qt.RightToLeft
+        visible: true
+        spacing: 5
+      
+        //Rectangle {
+          //id: test
+          //width: 90
+          //height: 35
+          //color: "black"
+          //visible: true
+          //}
+
+          Clockwidgetv {
+            visible: true
+          }
+
+        Rectangle {
+          id: dndcircleContainer
+          height: 35
+          width: height
+          //radius: width / 2
+          color: "transparent"
+          visible: false
+
+          Rectangle {
+            id: dndCircle
+            anchors.centerIn: parent 
+            height: 25
+            width: height
+            radius: width / 2
+            color: "black"
+          }
+        }
+      }
   
     Rectangle {
       id: content
-      anchors.fill: parent
+      //anchors.fill: parent
+      width: hud.width
+      height: hud.height
       color: "transparent"
       opacity: 1 
  
@@ -134,5 +182,6 @@ Scope {
 
       
     } //Rectangle 
+  } // Column
   } //PanelWIndow
 }
