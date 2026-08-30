@@ -4,9 +4,36 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import QtQuick.Layouts
 import QtQml.Models
+import Quickshell.Services.Notifications
 
 Scope {
   id: root
+
+  NotificationServer {
+      id: notifyService
+      actionsSupported: true
+      bodySupported: true
+      bodyMarkupSupported: true
+      persistenceSupported: true
+      bodyHyperlinksSupported: true
+  }
+
+  Connections {
+    target: notifyService
+    function onNotification(n) {
+      n.tracked = true;
+      NotificationList.add(n);
+      hud.visible = true;
+      passiveWidget = true;
+    }
+  }
+
+  GlobalShortcut {
+      name: "notificationWidget_hud"
+      onPressed: {
+      root.passiveWidget = false  
+      }
+  }
 
   Component.onDestruction: {
     NotificationList.now.clear();
@@ -33,7 +60,8 @@ Scope {
     margins.top: 30
     anchors.right: true
     margins.right: 30
-
+    mask: Region { item: rect }
+    
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.namespace: "notificationWidget_hud"
     WlrLayershell.keyboardFocus: root.passiveWidget ? WlrKeyboardFocus.None : WlrKeyboardFocus.Exclusive
@@ -99,34 +127,40 @@ Scope {
 
         delegate: Rectangle {
           id: noteDelegate
+          //required property Notification note
           width: noteList.width
-          height: noteDelegate.isSelected || root.passiveWidget ? contentColumn.implicitHeight + 20 : 50
+          //height: noteDelegate.isSelected || root.passiveWidget ? contentColumn.implicitHeight + 20 : 50
+          height: noteDelegate.isSelected ? contentColumn.implicitHeight + 20 : 50
           color: urgency == 2 ? "pink" : noteDelegate.isSelected ? "#F8F9E8" : "#f1f1f0"
           //visible: root.passiveWidget && !newnote ? false : true   
           //opacity: noteDelegate.isSelected ? 1 : 0.7
           radius: 12
           opacity: visible ? 1 : 0
           scale: visible ? 1 : 0
-          visible: false
+          visible: true
+          border.width: noteDelegate.isSelected && !root.passiveWidget ? 2 : 0
+          border.color: "red"
 
           Behavior on opacity { NumberAnimation { duration: 200 } }
           Behavior on scale { NumberAnimation { duration: 600; easing.type: Easing.OutBounce; easing.amplitude: 0.2 } }
 
-          Component.onCompleted: {
-            noteDelegate.visible = true;
-            console.log(NotificationList.history.body);
-          }
+          //Component.onCompleted: {
+          //  noteDelegate.visible = true;
+            //console.log(NotificationList.history.body);
+          //}
 
           readonly property bool isSelected: ListView.isCurrentItem
 
           Keys.onEscapePressed: { 
-            root.closeNoteWidgetRequested();
+            //root.closeNoteWidgetRequested();
+            passiveWidget = true
           }
 
           Keys.onPressed: (event) => {
             if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
               event.accepted = true;
               NotificationList.history.clear();
+              NotificationList.now.clear();
               root.closeNoteWidgetRequested();
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
               //event.accepted = true;
@@ -141,7 +175,16 @@ Scope {
                 Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "toggledonotdisturboff"]);
               }
               doNotDisturb();
-            }           
+            }
+            let item = NotificationList.history.get(noteList.currentIndex)
+            if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
+              let targetIndex = event.key;
+              if (item.rawN && targetIndex < item.rawN.actions.length) {
+                let targetAction = item.rawN.actions[targetIndex];
+                targetAction.invoke();
+                event.accepted = true;
+              }
+            }
           }
 
           Text {
@@ -157,7 +200,8 @@ Scope {
             anchors.right: parent.right 
             anchors.topMargin: 10
             anchors.rightMargin: 10
-            visible: noteDelegate.isSelected || root.passiveWidget ? true : false 
+            //visible: noteDelegate.isSelected || root.passiveWidget ? true : false
+            visible: noteDelegate.isSelected ? true : false
           } 
  
           Column {
@@ -177,21 +221,27 @@ Scope {
               font.weight: Font.Bold
               font.capitalization: Font.AllLowercase
               verticalAlignment: Text.AlignVCenter
-              wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
-              elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
+              //wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
+              //elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
+              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
+
               //visible: noteDelegate.isSelected Text.NoWrap 
             }
 
             Text {
               width: parent.width
               text: NotificationList.history.count === 0 ? modelData.body : body
+              //text: note?.body ?? "error"
               //text: modelData.body
               color: "black"
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
-              wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
-              elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
+              //wrapMode: noteDelegate.isSelected || root.passiveWidget ? Text.Wrap : Text.NoWrap
+              //elide: noteDelegate.isSelected || root.passiveWidget ? Text.ElideNone : Text.ElideRight
+              wrapMode: noteDelegate.isSelected ? Text.Wrap : Text.NoWrap
+              elide: noteDelegate.isSelected ? Text.ElideNone : Text.ElideRight
               //visible: noteDelegate.isSelected
             }
 
@@ -230,12 +280,15 @@ Scope {
               text: {
                 let output = ""
                 if (actionTextStr !== "") {
-                  if (!root.passiveWidget) {
-                    output = "<br>" + actionTextStr.split(",")
-                  } else {
-                    return "<br> Actions available"
-                  }
+                  output = "<br>" + actionTextStr.split(",")
                 }
+                //if (actionTextStr !== "") {
+                //  if (!root.passiveWidget) {
+                //    output = "<br>" + actionTextStr.split(",")
+                //  } else {
+                //    return "<br> Actions available"
+                //  }
+                //}
                 return output
               }
               //text: !root.passiveWidget ? "<br>" + actionTextStr.split(",") : "<br> Actons available"
@@ -243,7 +296,8 @@ Scope {
               font.pixelSize: 14
               font.family: "DepartureMono Nerd Font Mono"
               verticalAlignment: Text.AlignVCenter
-              visible: noteDelegate.isSelected || root.passiveWidget ? true : false
+              //visible: noteDelegate.isSelected || root.passiveWidget ? true : false
+              visible: noteDelegate.isSelected ? true : false
             }
           } //Column one
 

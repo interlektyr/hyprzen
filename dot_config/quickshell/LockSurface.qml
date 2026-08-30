@@ -37,10 +37,10 @@ Rectangle {
     }
   //}
 
-	Button {
-		text: "Its not working, let me out"
-		onClicked: context.unlocked();
-	}
+	//Button {
+		//text: "Its not working, let me out"
+		//onClicked: context.unlocked();
+	//}
 
 	//Label {
 	//	id: clock

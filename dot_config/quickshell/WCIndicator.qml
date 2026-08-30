@@ -76,13 +76,12 @@ Scope {
             //}
 
             Behavior on width {
-              //NumberAnimation { duration: 200; easing.type: Easing.OutBack }
+              //NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
               SpringAnimation {
                 spring: 3
                 damping: 0.4
                 mass: 1.0
                 epsilon: 0.25 
-
               }
             } 
 

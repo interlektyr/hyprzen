@@ -2,7 +2,7 @@ import Quickshell
 import QtQuick
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Services.Notifications
+//import Quickshell.Services.Notifications
 
 
 ShellRoot {
@@ -33,9 +33,14 @@ ShellRoot {
     }
 
     //NOTIFICATION SERVICE 
-    NotificationServer {
-      id: notifyService
-    }
+    //NotificationServer {
+    //  id: notifyService
+    //  actionsSupported: true
+    //  bodySupported: true
+    //  bodyMarkupSupported: true
+    //  persistenceSupported: true
+    //  bodyHyperlinksSupported: true
+    //}
        
     // PROPERTIES
     //
@@ -187,14 +192,14 @@ ShellRoot {
     }
 
     //NotificationWidget
-    GlobalShortcut {
-      name: "notificationWidget_hud"
-      onPressed: {
-        root.passiveNoteWidget = false;
-        autoCloseNoteWidgetTimer.stop();
-        root.showNoteWidget = true;
-      }
-    }
+    //GlobalShortcut {
+    //  name: "notificationWidget_hud"
+    //  onPressed: {
+    //    root.passiveNoteWidget = false;
+    //    autoCloseNoteWidgetTimer.stop();
+    //    root.showNoteWidget = true;
+    //  }
+    //}
 
     // Where is my LockScreen
     GlobalShortcut {
@@ -312,7 +317,7 @@ ShellRoot {
     Loader {
         id: workspaceLoader
         active: root.showWorkspaceWidget
-        source: "WorkspaceWidget.qml" 
+        source: "WorkspaceWidget_1.qml" 
         //onLoaded: if (item) item.wcbgPath = root.wcBackgroundImage;
         onLoaded: {
           if (item) {
@@ -363,7 +368,7 @@ ShellRoot {
     Loader {
       id: acLoader
       active: root.showACWidget
-      source: "AppCommander.qml" 
+      source: "Appcommander_V2.qml" 
     }
 
     // Power Menu
@@ -390,8 +395,9 @@ ShellRoot {
     //NotificatonWidget
     Loader {
       id: noteWidgetLoader
-      active: root.showNoteWidget
-      source: "NotificationWidget.qml"
+      active: true 
+      //root.showNoteWidget
+      source: "NotificationWidget_1.qml"
 
       onLoaded: {
         if (item) {
@@ -497,28 +503,30 @@ ShellRoot {
     }
     
     //Notification 
-    Connections {
-      target: notifyService 
-      function onNotification(n) {
-        if (noteWidgetLoader.status == Loader.Ready && root.passiveNoteWidget == false) {
-           NotificationList.add(n);
-        } else {
-           NotificationList.add(n);
-           if (root.setDoNotDisturbNote == false) {
-             root.passiveNoteWidget = true
-             root.showNoteWidget = true;
-             autoCloseNoteWidgetTimer.restart();
-           }
-        }
-      }
-    }
+    //Connections {
+    //  target: notifyService
+    //  function onNotification(n) {
+    //    n.tracked = true
+    //    if (noteWidgetLoader.status == Loader.Ready && root.passiveNoteWidget == false) {
+    //       NotificationList.add(n);
+    //    } else {
+    //       NotificationList.add(n);
+    //       if (root.setDoNotDisturbNote == false) {
+    //         root.passiveNoteWidget = true
+    //         root.showNoteWidget = true;
+    //         autoCloseNoteWidgetTimer.restart();
+    //       }
+    //    }
+    //  }
+    //}
 
     Connections {
       target: noteWidgetLoader.item
       ignoreUnknownSignals: true 
 
       function onCloseNoteWidgetRequested() {
-        root.showNoteWidget = false
+        //root.showNoteWidget = false
+        root.passiveNoteWidget = true
       }
 
       function onDoNotDisturb() {
@@ -540,6 +548,10 @@ ShellRoot {
       }
     }
 
+
+    //NotificationWidget {}
+    ClockWidget_V2 {}
+    Polkit {}
 }
 
 

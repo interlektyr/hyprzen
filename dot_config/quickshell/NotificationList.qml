@@ -43,7 +43,8 @@ Singleton {
       "body": n.body,
       "urgency": n.urgency,
       //i tidigare version var det texts.join(";")
-      "actionTextStr": texts.join(" ")
+      "actionTextStr": texts.join(" "),
+      "rawN": n
     })
 
     rightNow.insert(0, {
@@ -51,7 +52,7 @@ Singleton {
       "summary": n.summary,
       "body": n.body,
       "urgency": n.urgency,
-      "actionTextStr": texts.join(" ")
+      //"actionTextStr": texts.join(" ")
     })
   }
  

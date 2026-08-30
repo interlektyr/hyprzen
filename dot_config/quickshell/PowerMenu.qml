@@ -53,7 +53,9 @@ Scope {
       id: testRec 
       width: 520 
       height: 260
-      color: "#F8F9E8"
+      color: "#1E2528"
+      border.color: "pink"
+      border.width: 2
       anchors.centerIn: parent //- ifall du vill ha den mitt på skärmen
       //anchors.horizontalCenter: parent.horizontalCenter
       //anchors.top: parent.top
@@ -156,7 +158,7 @@ Scope {
 
       Text {
         text: "power"
-        color: "#272E33"
+        color: "white"
         font.pixelSize: 50
         font.family: "Work Sans"
         font.weight: Font.Bold
@@ -173,14 +175,15 @@ Scope {
       }
 
       Text {
-        text: "[\uf062/\uf063] navigation [enter] " + powerOpt.powerEntries[listView.currentIndex].desc + " [esc] quit"
-        color: "#1e2528"
+        //text: "[\uf062/\uf063] navigation [enter] " + powerOpt.powerEntries[listView.currentIndex].desc + " [esc] quit"
+        text: "[enter] " + powerOpt.powerEntries[listView.currentIndex].desc 
+        color: "white"
         font.pixelSize: 15
         font.family: "DepartureMono Nerd Font Mono"
         anchors.bottom: parent.bottom
-        anchors.left: parent.left 
+        anchors.right: parent.right 
         anchors.bottomMargin: 10
-        anchors.leftMargin: 10
+        anchors.rightMargin: 10
         font.letterSpacing: -1
 
         OpacityAnimator on opacity {
@@ -244,7 +247,7 @@ Scope {
 
                 Text {
                   text: modelData.title
-                  color: isSelected ? "pink" : "black"
+                  color: isSelected ? "pink" : "white"
                   font.pixelSize: 26 
                   font.family: "DepartureMono Nerd Font Mono"
                   verticalAlignment: Text.AlignVCenter

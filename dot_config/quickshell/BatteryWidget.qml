@@ -6,7 +6,7 @@ import Quickshell.Hyprland
 import QtQuick.Window
 import Qt5Compat.GraphicalEffects
 import Quickshell.Io
-import Quickshell.Services.UPower
+//import Quickshell.Services.UPower
 
 //BATTERY
 
