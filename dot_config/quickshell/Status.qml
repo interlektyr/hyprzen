@@ -14,13 +14,68 @@ PanelWindow {
   margins.top: 5 
   margins.left: (Screen.width / 2) - (statusRect.width / 2) 
   color: "transparent"
+  visible: false
 
-  property var typeStat: "battery"
+  property var typeStat: "connections"
   property var batIcon: ""
   property real batteryLevel: 0
   property bool isCharging: false
   property real volLevel: 0
   property bool isMuted: false
+
+  property string access: "ONLINE"
+  property string wifi: "unknown"
+  property string ssid: ""
+  property string wifiIp: ""
+  property string eto: ""
+  property string ethernet: "unknown"
+  property string ethernetIp: ""
+  property string wireguard: "DISABLED"
+  property string wireguardLocation: ""
+  property string wireguardIp: ""
+  property string fw: "DOWN"
+  property string torrentServer: "NOT RUNNING"
+  property bool torrentDownloading: false
+  property bool torrentSeeding: false
+  property string bluetoothPower: "OFF"
+  property var bluetoothDevices: [] 
+
+  property string terminalOpt: "kitty"
+
+  Component.onCompleted: {
+    batteryInfo.running = true;
+    networkProcess.running = true;
+    //statusBase.visible = true;
+  }
+
+  Process {
+    id: networkProcess
+    command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "getconnections"] // Ändra till absolut sökväg till ditt skript
+        
+    running: false
+    stdout: StdioCollector {
+      onStreamFinished: {
+         let d = JSON.parse(data);
+          statusBase.access = d.access;
+          statusBase.wifi = d.wifi;
+          statusBase.ssid = d.ssid;
+          statusBase.wifiIp = d.wifi_ip;
+          statusBase.eto = d.eto;
+          statusBase.ethernet = d.ethernet;
+          statusBase.ethernetIp = d.ethernet_ip;
+          statusBase.wireguard = d.wireguard;
+          statusBase.wireguardLocation = d.wireguard_location;
+          statusBase.wireguardIp = d.wireguard_ip;
+          statusBase.fw = d.fw;
+          statusBase.torrentServer = d.torrent_server;
+          statusBase.bluetoothPower = d.bluetooth_power;
+          statusBase.bluetoothDevices = d.bluetooth_devices;
+          if (statusBase.typeStat == "connections" && !statusBase.visible) {
+            statusBase.visible = true;
+          }
+      }
+    }
+  }
 
   Process {
     id: batteryInfo
@@ -44,28 +99,32 @@ PanelWindow {
       console.log(batTrans)
       if (batTrans > 90 && batTrans < 100) {
         statusBase.batIcon = "󰂂"
-        } else if (batTrans > 80 && batTrans < 90) {
+        //du måste lägga till typ >= eller om det är =>
+        } else if (batTrans >= 80 && batTrans < 90) {
         statusBase.batIcon = "󰂁"
-        } else if (batTrans > 70 && batTrans < 80) {
+        } else if (batTrans >= 70 && batTrans < 80) {
         statusBase.batIcon = "󰂀"
-        } else if (batTrans > 60 && batTrans < 70) {
+        } else if (batTrans >= 60 && batTrans < 70) {
         statusBase.batIcon = "󰁿"
-        } else if (batTrans > 50 && batTrans < 60) {
+        } else if (batTrans >= 50 && batTrans < 60) {
         statusBase.batIcon = "󰁾"
-        } else if (batTrans > 40 && batTrans < 50) {
+        } else if (batTrans >= 40 && batTrans < 50) {
         statusBase.batIcon = "󰁽"
-        } else if (batTrans > 30 && batTrans < 40) {
+        } else if (batTrans >= 30 && batTrans < 40) {
         statusBase.batIcon = "󰁼"
-        } else if (batTrans > 20 && batTrans < 30) {
+        } else if (batTrans >= 20 && batTrans < 30) {
         statusBase.batIcon = "󰁻"
-        } else if (batTrans > 10 && batTrans < 20) {
+        } else if (batTrans >= 10 && batTrans < 20) {
         statusBase.batIcon = "󰁺"
-        } else if (batTrans > 0 && batTrans < 10) {
+        } else if (batTrans >= 0 && batTrans < 10) {
         statusBase.batIcon = "󰂃"
         } else {
         console.log("No")
         statusBase.batIcon = "󰁹"
-        }          
+      } 
+      if (statusBase.typeStat == "battery" && !statusBase.visible) {
+        statusBase.visible = true;
+      }
       }
     }
   }
@@ -83,17 +142,30 @@ PanelWindow {
         if (parts.length >= 2) {
           statusBase.volLevel = parseFloat(parts[1]);
           statusBase.isMuted = output.includes("[MUTED]");
-        } 
+        }
+        if (statusBase.typeStat == "volume" && !statusBase.visible) {
+          statusBase.visible = true;
+        }
       }
     }
   }
 
   Timer {
+    id: batteryTimer
     interval: 5000 // Uppdatera var 5:e sekund
     running: true
     repeat: true
     onTriggered: batteryInfo.running = true
   }
+
+  Timer {
+    id: connectionsTimer
+    interval: 5000 // Uppdatera var 5:e sekund
+    running: true
+    repeat: true
+    onTriggered: networkProcess.running = true
+  }
+
 
   Rectangle {
     id: shadowMask
@@ -119,7 +191,7 @@ PanelWindow {
 
   Rectangle {
     id: statusRect
-    width: statusText.width + statusIcon.width + (statusBase.typeStat == "battery" ? 20 : 40)
+    width: statusText.width + statusIcon.width + (statusBase.typeStat == "connections" ? statusIcons.width + statusIcons.width + statusTexts.width + statusIcont.width + statusTextt.width : 0) + (statusBase.typeStat == "battery" ? 20 : statusBase.typeStat == "connections" ? 50 : 40)
     height: 35
     radius: 10
     //color: "#191d1f"
@@ -141,11 +213,17 @@ PanelWindow {
           anchors.centerIn: parent
           text: {
             let output = ""
+            let fpart = ""
+            let spart = ""
             if (statusBase.typeStat == "volume") {
               output = statusBase.isMuted ? "󰝛" : ""
             } else if (statusBase.typeStat == "battery") {
               output = statusBase.isCharging ? "󰂄" : statusBase.batIcon
               //output = "󰁹"
+            } else if (statusBase.typeStat == "connections") {
+              fpart = statusBase.access == "ONLINE" ? "󰤨  " : "󰤮  "
+              spart = statusBase.fw == "DISABLED" ? "  " : "󰒘  "
+              output = statusBase.access == "ONLINE" ? "󰤨" : "󰤮"
             }
             return output
           }
@@ -174,19 +252,109 @@ PanelWindow {
             output = statusBase.isMuted ? "MUTED" : Math.round(statusBase.volLevel * 100) + "%" 
           } else if (statusBase.typeStat == "battery") {
             output = Math.round(statusBase.batteryLevel * 100) + "%"  
+          } else if (statusBase.typeStat == "connections") {
+            output = statusBase.access == "ONLINE" ? "ONLINE" : "OFFLINE"
           }
           return output
         }
         color: "#F5D098"
         //font.family: "DepartureMono Nerd Font Mono"
         //font.pixelSize: 15
-        font.family: "Work Sans"
+        font.family: statusBase.typeStat == "connections" ? "DepartureMono Nerd Font Mono" : "Work Sans"
         font.weight: Font.ExtraBold
+        //font.family: "DepartureMono Nerd Font Mono"
         font.letterSpacing: 0
-        font.pixelSize: 20
+        font.pixelSize: statusBase.typeStat == "connections" ? 18 : 20
         //font.weight: Font.ExtraBold
         //font.letterSpacing: -5 
       }
+
+      Rectangle {
+        id: statusIcons
+        width: 20
+        height: 20
+        color: "transparent"
+        visible: statusBase.typeStat == "connections" ? true : false
+
+        Text {
+          anchors.centerIn: parent
+          text: statusBase.fw == "DISABLED" ? "" : "󰒘"
+          color: "#F5D098"
+          //font.family: "DepartureMono Nerd Font Mono"
+          //font.pixelSize: 15
+          font.family: "Work Sans"
+          font.weight: Font.ExtraBold
+          font.letterSpacing: 0
+          font.pixelSize: 25
+          //font.weight: Font.ExtraBold
+          //font.letterSpacing: -5
+        }
+      }
+
+      Text {
+        id: statusTexts
+        //anchors.centerIn: parent 
+        //text: "BAT " + Math.round(statusBase.batteryLevel * 100) + "% (" + (statusBase.isCharging ? "Charging" : "Discharging") + ")" 
+        //text: "BAT"
+        //text: statusBase.isMuted ? "VOL MUTED" : "VOL " + Math.round(statusBase.volLevel * 100) + "%"
+        text: statusBase.fw == "DISABLED" ? "DOWN" : "UP"  
+        color: "#F5D098"
+        //font.family: "DepartureMono Nerd Font Mono"
+        //font.pixelSize: 15
+        font.family: statusBase.typeStat == "connections" ? "DepartureMono Nerd Font Mono" : "Work Sans"
+        font.weight: Font.ExtraBold
+        //font.family: "DepartureMono Nerd Font Mono"
+        font.letterSpacing: 0
+        font.pixelSize: 18
+        //font.weight: Font.ExtraBold
+        //font.letterSpacing: -5
+        visible: statusBase.typeStat == "connections" ? true : false
+      }
+
+      Rectangle {
+        id: statusIcont
+        width: 20
+        height: 20
+        color: "transparent"
+        visible: statusBase.typeStat == "connections" ? true : false
+
+        Text {
+          anchors.centerIn: parent
+          text: statusBase.wireguard == "DISABLED" ? "󱐢" : "󱐡"
+          color: "#F5D098"
+          //font.family: "DepartureMono Nerd Font Mono"
+          //font.pixelSize: 15
+          font.family: "Work Sans"
+          font.weight: Font.ExtraBold
+          font.letterSpacing: 0
+          font.pixelSize: 25
+          //font.weight: Font.ExtraBold
+          //font.letterSpacing: -5
+        }
+      }
+
+      Text {
+        id: statusTextt
+        //anchors.centerIn: parent 
+        //text: "BAT " + Math.round(statusBase.batteryLevel * 100) + "% (" + (statusBase.isCharging ? "Charging" : "Discharging") + ")" 
+        //text: "BAT"
+        //text: statusBase.isMuted ? "VOL MUTED" : "VOL " + Math.round(statusBase.volLevel * 100) + "%"
+        text: statusBase.wireguard == "DISABLED" ? "DISABLED" : "ENABLED"  
+        color: "#F5D098"
+        //font.family: "DepartureMono Nerd Font Mono"
+        //font.pixelSize: 15
+        font.family: statusBase.typeStat == "connections" ? "DepartureMono Nerd Font Mono" : "Work Sans"
+        font.weight: Font.ExtraBold
+        //font.family: "DepartureMono Nerd Font Mono"
+        font.letterSpacing: 0
+        font.pixelSize: 18
+        //font.weight: Font.ExtraBold
+        //font.letterSpacing: -5
+        visible: statusBase.typeStat == "connections" ? true : false
+      }
+
+
+
     }
   }
 }
