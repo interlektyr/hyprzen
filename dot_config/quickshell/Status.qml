@@ -14,10 +14,11 @@ PanelWindow {
   margins.top: 5 
   margins.left: (Screen.width / 2) - (statusRect.width / 2) 
   color: "transparent"
-  visible: false
+  visible: true
 
   property var typeStat: "connections"
   property var batIcon: ""
+  property var wifiIcon: ""
   property real batteryLevel: 0
   property bool isCharging: false
   property real volLevel: 0
@@ -27,9 +28,10 @@ PanelWindow {
   property string wifi: "unknown"
   property string ssid: ""
   property string wifiIp: ""
+  property real wifiStrenght: 0
   property string eto: ""
-  property string ethernet: "unknown"
-  property string ethernetIp: ""
+  property string ethernet: "disconnected"
+  property string ethernetIp: "none"
   property string wireguard: "DISABLED"
   property string wireguardLocation: ""
   property string wireguardIp: ""
@@ -38,7 +40,7 @@ PanelWindow {
   property bool torrentDownloading: false
   property bool torrentSeeding: false
   property string bluetoothPower: "OFF"
-  property var bluetoothDevices: [] 
+  property var bluetoothDevices: []
 
   property string terminalOpt: "kitty"
 
@@ -51,8 +53,7 @@ PanelWindow {
   Process {
     id: networkProcess
     command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "getconnections"] // Ändra till absolut sökväg till ditt skript
-        
-    running: false
+    running: true    
     stdout: StdioCollector {
       onStreamFinished: {
          let d = JSON.parse(data);
@@ -60,6 +61,7 @@ PanelWindow {
           statusBase.wifi = d.wifi;
           statusBase.ssid = d.ssid;
           statusBase.wifiIp = d.wifi_ip;
+          statusBase.wifiStrenght = d.wifi_signal;
           statusBase.eto = d.eto;
           statusBase.ethernet = d.ethernet;
           statusBase.ethernetIp = d.ethernet_ip;
@@ -70,9 +72,6 @@ PanelWindow {
           statusBase.torrentServer = d.torrent_server;
           statusBase.bluetoothPower = d.bluetooth_power;
           statusBase.bluetoothDevices = d.bluetooth_devices;
-          if (statusBase.typeStat == "connections" && !statusBase.visible) {
-            statusBase.visible = true;
-          }
       }
     }
   }
@@ -80,7 +79,7 @@ PanelWindow {
   Process {
     id: batteryInfo
     command: ["bash", "-c", "echo $(cat /sys/class/power_supply/BAT0/capacity) $(cat /sys/class/power_supply/BAT0/status)"]
-    running: true
+    running: true    
     stdout: StdioCollector {
     onStreamFinished: {
       let output = text.trim();
@@ -96,7 +95,6 @@ PanelWindow {
 
       let batIcon = ""
       let batTrans = Math.round(statusBase.batteryLevel * 100)
-      console.log(batTrans)
       if (batTrans > 90 && batTrans < 100) {
         statusBase.batIcon = "󰂂"
         //du måste lägga till typ >= eller om det är =>
@@ -121,9 +119,17 @@ PanelWindow {
         } else {
         console.log("No")
         statusBase.batIcon = "󰁹"
-      } 
-      if (statusBase.typeStat == "battery" && !statusBase.visible) {
-        statusBase.visible = true;
+      }
+
+      let wifiIcon = ""
+      if (statusBase.wifiStrenght > 0 && statusBase.wifiStrenght < 25) {
+        statusBase.wifiIcon = "󰤟"
+      } else if (statusBase.wifiStrenght >= 25 && statusBase.wifiStrenght <= 50) {
+        statusBase.wifiIcon = "󰤢"
+      } else if (statusBase.wifiStrenght > 50 && statusBase.wifiStrenght < 90) {
+        statusBase.wifiIcon = "󰤥"
+      } else {
+        statusBase.wifiIcon = "󰤨"
       }
       }
     }
@@ -132,7 +138,7 @@ PanelWindow {
   Process {
     id: volProc
     command: ["bash", "-c", "wpctl get-volume @DEFAULT_AUDIO_SINK@"]
-    running: true
+    running: statusBase.typeStat == "volume" ? true : false
     stdout: StdioCollector {
       onStreamFinished: {
         let output = text.trim(); // Exempel: "Volume: 0.45" eller "Volume: 0.45 [MUTED]"
@@ -142,9 +148,6 @@ PanelWindow {
         if (parts.length >= 2) {
           statusBase.volLevel = parseFloat(parts[1]);
           statusBase.isMuted = output.includes("[MUTED]");
-        }
-        if (statusBase.typeStat == "volume" && !statusBase.visible) {
-          statusBase.visible = true;
         }
       }
     }
@@ -191,7 +194,7 @@ PanelWindow {
 
   Rectangle {
     id: statusRect
-    width: statusText.width + statusIcon.width + (statusBase.typeStat == "connections" ? statusIcons.width + statusIcons.width + statusTexts.width + statusIcont.width + statusTextt.width : 0) + (statusBase.typeStat == "battery" ? 20 : statusBase.typeStat == "connections" ? 50 : 40)
+    width: statusText.width + statusIcon.width + (statusBase.typeStat == "connections" ? statusIcons.width + statusIcons.width + statusTexts.width + statusIcont.width + statusTextt.width : 0) + (statusBase.typeStat == "connections" ? statusBase.ethernetIp !== "none" ? statusIconw.width + statusTextw.width : 0 : 0) + (statusBase.typeStat == "battery" ? 20 : statusBase.typeStat == "connections" ? 50 : 40)
     height: 35
     radius: 10
     //color: "#191d1f"
@@ -213,22 +216,33 @@ PanelWindow {
           anchors.centerIn: parent
           text: {
             let output = ""
-            let fpart = ""
-            let spart = ""
+            console.log("ethernet: " + statusBase.ethernet)
+            console.log("et_ip: " + statusBase.ethernetIp)
             if (statusBase.typeStat == "volume") {
               output = statusBase.isMuted ? "󰝛" : ""
             } else if (statusBase.typeStat == "battery") {
               output = statusBase.isCharging ? "󰂄" : statusBase.batIcon
               //output = "󰁹"
             } else if (statusBase.typeStat == "connections") {
-              fpart = statusBase.access == "ONLINE" ? "󰤨  " : "󰤮  "
-              spart = statusBase.fw == "DISABLED" ? "  " : "󰒘  "
-              output = statusBase.access == "ONLINE" ? "󰤨" : "󰤮"
+              output = statusBase.access == "ONLINE" ? statusBase.wifiIcon : "󰤮"
             }
             return output
           }
           //text: (statusBase.isCharging ? "󰂄" : "󰁹")
-          color: "#F5D098"
+          //color: "#F5D098"
+          color: {
+            let output = ""
+            if (statusBase.typeStat == "connections") {
+              if (statusBase.wifiIcon == "󰤟") {
+                output = "#F5D098" 
+              } else {
+                output = "#A7C080" 
+              }
+            } else {
+              output = "#F5D098" 
+            }
+            return output
+          }
           //font.family: "DepartureMono Nerd Font Mono"
           //font.pixelSize: 15
           font.family: "Work Sans"
@@ -270,6 +284,60 @@ PanelWindow {
       }
 
       Rectangle {
+        id: statusIconw
+        width: 20
+        height: 20
+        color: "transparent"
+        visible: {
+          let output = false
+          if (statusBase.typeStat == "connections" && statusBase.ethernetIp !== "none") {
+            output = true 
+          }
+          return output
+        }
+        Text {
+          anchors.centerIn: parent
+          text: "󰈁"
+          color: "#A7C080" 
+          //"#F5D098"
+          //font.family: "DepartureMono Nerd Font Mono"
+          //font.pixelSize: 15
+          font.family: "Work Sans"
+          font.weight: Font.ExtraBold
+          font.letterSpacing: 0
+          font.pixelSize: 25
+          //font.weight: Font.ExtraBold
+          //font.letterSpacing: -5
+        }
+      }
+
+      Text {
+        id: statusTextw
+        visible: {
+          let output = false
+          if (statusBase.typeStat == "connections" && statusBase.ethernetIp !== "none") {
+            output = true 
+          }
+          return output
+        }
+        //anchors.centerIn: parent 
+        //text: "BAT " + Math.round(statusBase.batteryLevel * 100) + "% (" + (statusBase.isCharging ? "Charging" : "Discharging") + ")" 
+        //text: "BAT"
+        //text: statusBase.isMuted ? "VOL MUTED" : "VOL " + Math.round(statusBase.volLevel * 100) + "%"
+        text: "PLUGGED"
+        color: "#F5D098"
+        //font.family: "DepartureMono Nerd Font Mono"
+        //font.pixelSize: 15
+        font.family: statusBase.typeStat == "connections" ? "DepartureMono Nerd Font Mono" : "Work Sans"
+        font.weight: Font.ExtraBold
+        //font.family: "DepartureMono Nerd Font Mono"
+        font.letterSpacing: 0
+        font.pixelSize: statusBase.typeStat == "connections" ? 18 : 20
+        //font.weight: Font.ExtraBold
+        //font.letterSpacing: -5 
+      }
+
+      Rectangle {
         id: statusIcons
         width: 20
         height: 20
@@ -279,7 +347,8 @@ PanelWindow {
         Text {
           anchors.centerIn: parent
           text: statusBase.fw == "DISABLED" ? "" : "󰒘"
-          color: "#F5D098"
+          color: statusBase.fw == "DISABLED" ? "#E67E80" : "#A7C080" 
+          //"#F5D098"
           //font.family: "DepartureMono Nerd Font Mono"
           //font.pixelSize: 15
           font.family: "Work Sans"
@@ -321,7 +390,8 @@ PanelWindow {
         Text {
           anchors.centerIn: parent
           text: statusBase.wireguard == "DISABLED" ? "󱐢" : "󱐡"
-          color: "#F5D098"
+          color: statusBase.wireguard == "DISABLED" ? "#E67E80" : "#A7C080"
+          //color: "#F5D098"
           //font.family: "DepartureMono Nerd Font Mono"
           //font.pixelSize: 15
           font.family: "Work Sans"
