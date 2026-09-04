@@ -7,38 +7,43 @@ import QtQuick.Window
 import Qt5Compat.GraphicalEffects
 import Quickshell.Io
 
-//Appcommander final V2
+//Sasher final V2
 
 Scope {
-  id: widgetRoot 
+  id: widgetRoot
 
-  property string terminalOpt: "kitty"
+  property var specialWindow: []
 
-  property var allApps: []
+  Process {
+  id: windowFetcher
+  running: true
+  command: ["hyprctl", "clients", "-j"]
+  stdout: StdioCollector {
+    onStreamFinished: {
+      try {
+        let allWindows = JSON.parse(text);
 
-  Component.onCompleted: {
-    allApps = DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name, Qt.locale().name));
-  }
-
-  Connections {
-    target: DesktopEntries.applications
-      function onValuesChanged() {
-          allApps = DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name, Qt.locale().name));
+        let filtered = allWindows
+          .filter(w => w.workspace.id === -98)
+          .map(w => ({
+            "class": w.class,
+            "title": w.title,
+            "address": w.address
+          }))
+        specialWindow = filtered;
+        console.log("Hittade " + specialWindow.length + " fönster.");
+      } catch (e) {
+        console.log("Kunde inte parsa JSON: " + e);
+      }
     }
   }
+  } 
 
   function fuzzyMatch(needle, haystack) {
     return haystack.toLowerCase().includes(needle.toLowerCase());
   }
-
-  function cleanExecString(execStr) {
-    if (!execStr) return ""; 
-    let cleaned = execStr.replace(/\s%[a-zA-Z]/g, "").trim();
-    cleaned = cleaned.replace(/['"]/g, "");
-    return cleaned;
-  }
   
-  signal closeACRequested()
+  signal closeStasherRequested()
 
   PanelWindow {
     id: testWidget
@@ -47,13 +52,13 @@ Scope {
     color: "transparent" 
 
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "appcommander_hud"
+    WlrLayershell.namespace: "stasher_hud"
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     WlrLayershell.exclusiveZone: -1
 
     TapHandler {
       onTapped:
-      widgetRoot.closeACRequested()
+      widgetRoot.closeStasherRequested()
     }
 
     Rectangle {
@@ -75,15 +80,15 @@ Scope {
       Behavior on opacity { NumberAnimation { duration: 200 } }
       Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
 
-      Keys.onEscapePressed: widgetRoot.closeACRequested()
+      Keys.onEscapePressed: closeStasherRequested()
 
       Component.onCompleted: {
         inputRec.visible = true
       }
 
       Text {
-        id: titleAC
-        text: "appcommander"
+        id: titleStasher
+        text: "stasher"
         color: "white"
         font.pixelSize: 70
         font.family: "Work Sans"
@@ -118,7 +123,7 @@ Scope {
           //Layout.fillHeight: true
           Layout.preferredHeight: 30
           Layout.margins: 20
-          Layout.topMargin: titleAC.height + 5
+          Layout.topMargin: titleStasher.height + 5
           focus: true
           color: "white"
           font.pixelSize: 30
@@ -141,42 +146,26 @@ Scope {
           }
 
           Keys.onPressed: (event) => {
-                if (event.key === Qt.Key_Down) {
-                  event.accepted = true;
-                  if (listView.count > 0) {
-                  listView.currentIndex = (listView.currentIndex + 1) % listView.count;
-                }
-                //console.log("Ner");
+            if (event.key === Qt.Key_Down) {
+              event.accepted = true;
+              if (listView.count > 0) {
+              listView.currentIndex = (listView.currentIndex + 1) % listView.count;
               }
-              else if (event.key === Qt.Key_Up) {
-                event.accepted = true;
-                if (listView.count > 0) {
-                  listView.currentIndex = (listView.currentIndex - 1 + listView.count) % listView.count
-                }
-                //console.log("Up");
+            }
+            else if (event.key === Qt.Key_Up) {
+              event.accepted = true;
+              if (listView.count > 0) {
+                listView.currentIndex = (listView.currentIndex - 1 + listView.count) % listView.count
               }
-              else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                event.accepted = true;
-                //const exCom = listView.model[listView.currentIndex];
-                //console.log(exCom.execString);
-                //var rawExec = listView.model[listView.currentIndex].execString;
-                //var cleanCmd = cleanExecString(rawExec);
-                //var termRun = listView.model[listView.currentIndex].runInTerminal;
-                //console.log("Original:", rawExec);
-                //console.log("Städad:", cleanCmd);
-                var getBackId = listView.model[listView.currentIndex].address;
-                var commandType = "stasher"
-                //console.log(termRun)
-                //if (listView.model[listView.currentIndex].runInTerminal) {
-                //Quickshell.execDetached(["sh", "-c", "kitty", "-e", cleanCmd]);
-                console.log(getBackId);
-                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", commandType, getBackId]);
-                //} else {
-                //  Quickshell.execDetached(["sh", "-c", cleanCmd]); 
-                //}
-               widgetRoot.closeStasherRequested();
-              } 
-            }        
+            }
+            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+              event.accepted = true;
+              var getBackId = listView.model[listView.currentIndex].address;
+              var commandType = "stasher"
+              Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", commandType, getBackId]);
+              widgetRoot.closeStasherRequested()
+            } 
+          }
         }
 
         Rectangle {
@@ -200,14 +189,14 @@ Scope {
               let query = searchField.text.trim();
 
               if (query === "") {
-                return allApps;
+                return specialWindow;
               }
 
               let filtered = [];
 
-              for (let i = 0; i < allApps.length; i++) {
-                const app = allApps[i];
-                if (fuzzyMatch(query, app.name + " " + (app.comment || "") + " " + (app.execString || ""))) {
+              for (let i = 0; i < specialWindow.length; i++) {
+                const app = specialWindow[i];
+                if (fuzzyMatch(query, app.title + " " + (app.class || "") + " " + (app.address || ""))) {
                   filtered.push(app);
                 }
               }
@@ -248,7 +237,7 @@ Scope {
                 Text {
                   //comment innebär lång beskrivning,
                   //text: modelData.name + " (" + modelData.keywords + ") "
-                  text: modelData.name
+                  text: modelData.class + modelData.title
                   color: isSelected ? "pink" : "#f8f9e8"
                   font.pixelSize: 16
                   font.family: "DepartureMono Nerd Font Mono"
@@ -261,6 +250,5 @@ Scope {
         } //TextInput + Rectangle
       } //CColumn
     } //Rectangle
-  } //PanelWindow
-} // Scope
-              
+  } // PanelWindow
+}

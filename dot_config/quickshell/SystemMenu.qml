@@ -45,12 +45,10 @@ Scope {
       id: testRec 
       width: 520 
       height: 260
-      color: "#F8F9E8"
-      anchors.centerIn: parent //- ifall du vill ha den mitt på skärmen
-      //anchors.horizontalCenter: parent.horizontalCenter
-      //anchors.top: parent.top
-      //anchors.topMargin: 10
-      //focus: true
+      color: "#1E2528"
+      border.color: "pink"
+      border.width: 2
+      anchors.centerIn: parent
       radius: 12
       transformOrigin: Item.Top
       opacity: visible ? 1 : 0
@@ -116,7 +114,7 @@ Scope {
 
       Text {
         text: "system"
-        color: "#272E33"
+        color: "white"
         font.pixelSize: 50
         font.family: "Work Sans"
         font.weight: Font.Bold
@@ -134,7 +132,7 @@ Scope {
 
       Text {
         text: "[\uf062/\uf063] navigation [enter] " + powerOpt.powerEntries[listView.currentIndex].desc + " [esc] quit"
-        color: "#1e2528"
+        color: "white"
         font.pixelSize: 15
         font.family: "DepartureMono Nerd Font Mono"
         anchors.bottom: parent.bottom
@@ -205,7 +203,7 @@ Scope {
 
                 Text {
                   text: modelData.title
-                  color: isSelected ? "pink" : "black"
+                  color: isSelected ? "pink" : "white"
                   font.pixelSize: 26 
                   font.family: "DepartureMono Nerd Font Mono"
                   verticalAlignment: Text.AlignVCenter

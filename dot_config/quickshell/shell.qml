@@ -112,6 +112,9 @@ ShellRoot {
     property bool passiveNoteWidget: true
     property bool setDoNotDisturbNote: false
 
+    property bool toggleConnectionStatus: false
+    property var typeOfStat: "volume"
+
     // GLOBALSHORTCUTS
     // WorkspaceWidget
     GlobalShortcut {
@@ -191,6 +194,56 @@ ShellRoot {
       }
     }
 
+    GlobalShortcut {
+      name: "status_connections"
+      //description: "Show the connection status widget"
+      onPressed: {
+        if (root.toggleConnectionStatus == false || root.typeOfStat !== "connections") {
+          root.typeOfStat = "connections";
+          root.toggleConnectionStatus = true;
+        } else {
+          root.toggleConnectionStatus = false;
+        }
+      }
+    }
+
+    GlobalShortcut {
+      name: "status_battery"
+      //description: "Show the connection status widget"
+      onPressed: {
+        if (root.toggleConnectionStatus == false || root.typeOfStat !== "battery") {
+          root.typeOfStat = "battery";
+          root.toggleConnectionStatus = true;
+        } else {
+          root.toggleConnectionStatus = false;
+        }
+      }
+    }
+
+
+    GlobalShortcut {
+      name: "status_volume"
+      //description: "Show the connection status widget"
+      onPressed: {
+        if (root.toggleConnectionStatus == false || root.typeOfStat !== "volume") {
+          root.typeOfStat = "volume";
+          root.toggleConnectionStatus = true;
+        } else {
+          root.toggleConnectionStatus = false;
+        }
+      }
+    }
+
+    GlobalShortcut {
+      name: "status_volume_change"
+      //description: "Show the connection status widget"
+      onPressed: {
+          root.typeOfStat = "volume_change";
+          root.toggleConnectionStatus = true;
+      } 
+    }
+
+
     //NotificationWidget
     //GlobalShortcut {
     //  name: "notificationWidget_hud"
@@ -265,6 +318,14 @@ ShellRoot {
             root.showNoteWidget = false; 
           }
         }
+      }
+
+    Timer {
+      id: visibilityTimer
+      interval: root.typeOfStat == "connections" ? 10000 : 4000
+      running: root.toggleConnectionStatus = true
+      repeat: true
+      onTriggered: root.toggleConnectionStatus = false;
     }
 
 
@@ -389,7 +450,7 @@ ShellRoot {
     Loader {
       id: stasherLoader
       active: root.showStasherWidget
-      source: "Stasher.qml"
+      source: "Stasher_1.qml"
     }
 
     //NotificatonWidget
@@ -552,7 +613,10 @@ ShellRoot {
     //NotificationWidget {}
     //ClockWidget_V2 {}
     Polkit {}
-}
+    ZenStatus {
+      visible: root.toggleConnectionStatus
+    }
+  }
 
 
 //ShellRoot {

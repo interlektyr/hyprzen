@@ -44,6 +44,7 @@ Item {
       anchors.centerIn: parent 
       text: Qt.formatDateTime(new Date(), "HH:mm")
       color: "#F5D098"
+      //font.family: "DepartureMono Nerd Font Mono"
       font.family: "Work Sans"
       font.weight: Font.ExtraBold
       font.letterSpacing: 0
