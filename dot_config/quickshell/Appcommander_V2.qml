@@ -159,22 +159,20 @@ Scope {
                 event.accepted = true;
                 //const exCom = listView.model[listView.currentIndex];
                 //console.log(exCom.execString);
-                //var rawExec = listView.model[listView.currentIndex].execString;
-                //var cleanCmd = cleanExecString(rawExec);
+                var rawExec = listView.model[listView.currentIndex].execString;
+                var cleanCmd = cleanExecString(rawExec);
                 //var termRun = listView.model[listView.currentIndex].runInTerminal;
-                //console.log("Original:", rawExec);
-                //console.log("Städad:", cleanCmd);
-                var getBackId = listView.model[listView.currentIndex].address;
-                var commandType = "stasher"
-                //console.log(termRun)
-                //if (listView.model[listView.currentIndex].runInTerminal) {
-                //Quickshell.execDetached(["sh", "-c", "kitty", "-e", cleanCmd]);
-                console.log(getBackId);
-                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", commandType, getBackId]);
-                //} else {
-                //  Quickshell.execDetached(["sh", "-c", cleanCmd]); 
-                //}
-               widgetRoot.closeStasherRequested();
+                console.log("Original:", rawExec);
+                console.log("Städad:", cleanCmd);
+                var termRun = listView.model[listView.currentIndex].runInTerminal;
+                console.log(termRun)
+                if (listView.model[listView.currentIndex].runInTerminal) {
+               //Quickshell.execDetached(["sh", "-c", "kitty", "-e", cleanCmd]);
+                  Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", widgetRoot.terminalOpt, cleanCmd]);
+                } else {
+                  Quickshell.execDetached(["sh", "-c", cleanCmd]); 
+                }
+               widgetRoot.closeACRequested();
               } 
             }        
         }
