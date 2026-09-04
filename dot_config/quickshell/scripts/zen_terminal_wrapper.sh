@@ -4,15 +4,36 @@ terminalOpt=$1
 cmString=$2
 cmStringArg=$3
 
+# COMMAND FOR GETTING FOCUES window
+
+check_focus_title() {
+  fotile=$(hyprctl activewindow -j | jq -r ".title")
+  echo "$fotile"
+  exit
+}
+
+# COMMAND FOR CHECKING INTERNET ACCESS
+
+check_internet() {
+  if curl -fsS --max-time 5 -o /dev/null https://www.google.com/generate_204; then
+    echo "online"
+  else
+    echo "offline"
+  fi
+}
+
+# COMMANDS FOR CHECKING CONNECTIVITY
+
 get_connections() {
 
   # Initiera variabler
   wifi="disconnected"
+  wifi_signal="0"
   ssid=""
   wifi_ip=""
   eto=""
   ethernet="disconnected"
-  ethernet_ip=""
+  ethernet_ip="none"
   wireguard="DISABLED"
   wireguard_location=""
   wireguard_ip=""
@@ -68,6 +89,7 @@ get_connections() {
       if [ "$state" = "connected" ]; then
         ssid="$conn"
         wifi_ip="$current_ip"
+        wifi_signal=$(nmcli -t -f IN-USE,SIGNAL device wifi | awk -F':' '$1 ~ /\*/ {print $2}' | head -n1)
       fi
       ;;
     "ethernet")
@@ -93,7 +115,7 @@ get_connections() {
   fi
 
   if [ "$wireguard" = "ENABLED" ]; then
-    wireguard_location="$(mullvad status | awk '/Visible location: / {print $3 $4}')"
+    wireguard_location="$(mullvad status | awk '/Visible location: / {print $3 $4}' | sed 's/\.$//')"
     wireguard_ip="$(mullvad status | awk '/Visible location: / {print $6}')"
   fi
 
@@ -102,6 +124,7 @@ get_connections() {
 {
   "access": "$access",
   "wifi": "$wifi",
+  "wifi_signal": $wifi_signal,
   "ssid": "$ssid",
   "wifi_ip": "$wifi_ip",
   "eto": "$eto",
@@ -290,5 +313,17 @@ fi
 if [[ $terminalOpt == "getconnections" ]]; then
 
   get_connections
+
+fi
+
+if [[ $terminalOpt == "checkinternet" ]]; then
+
+  check_internet
+
+fi
+
+if [[ $terminalOpt == "gettitleofactivewin" ]]; then
+
+  check_focus_title
 
 fi
