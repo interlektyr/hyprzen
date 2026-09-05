@@ -18,7 +18,6 @@ pmpkg=(
   "uwsm"
   "hyprpicker"
   "wl-clipboard"
-  "dunst"
   "gum"
   "git"
   "wget"
