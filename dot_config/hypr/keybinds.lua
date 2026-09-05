@@ -34,20 +34,22 @@ hl.bind(mainMod .. " + Z", hl.dsp.exec_cmd("zen-browser"))
 ---Power
 hl.bind(mainMod .. " + CTRL + DELETE", hl.dsp.global("quickshell:power_hud"))
 ---System
-hl.bind(mainMod .. " + S", hl.dsp.global("quickshell:zensys_hud"))
+hl.bind(mainMod .. " + CTRL + S", hl.dsp.global("quickshell:zensys_hud"))
 ---Volume
-hl.bind(mainMod .. " + CTRL + V", hl.dsp.global("quickshell:volume_hud"))
+hl.bind(mainMod .. " + CTRL + V", hl.dsp.global("quickshell:status_volume"))
 ---Battery
-hl.bind(mainMod .. " + B", hl.dsp.global("quickshell:battery_hud"))
+hl.bind(mainMod .. " + CTRL + B", hl.dsp.global("quickshell:status_battery"))
 ---Workspace
 hl.bind(mainMod .. " + Control_R", hl.dsp.global("quickshell:workspace_hud"))
 --{ release = true })
 ---Lockscreen
 hl.bind(mainMod .. " + CTRL + L", hl.dsp.global("quickshell:lockTheScreen"))
 --Stasher
-hl.bind(mainMod .. " + H", hl.dsp.global("quickshell:stasher_hud"))
+hl.bind(mainMod .. " + CTRL + H", hl.dsp.global("quickshell:stasher_hud"))
 --Notifications
 hl.bind(mainMod .. " + CTRL + N", hl.dsp.global("quickshell:notificationWidget_hud"))
+--Test new connection widget
+hl.bind(mainMod .. " + CTRL + I", hl.dsp.global("quickshell:status_connections"))
 
 ---WINDOWS
 ---Focus follows mouse or move focus with mainMod + arrow keys
@@ -115,24 +117,26 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86AudioRaiseVolume", hl.dsp.global("quickshell:volume_hud"), { repeating = true })
+hl.bind("XF86AudioRaiseVolume", hl.dsp.global("quickshell:status_volume_change"), { repeating = true })
 hl.bind(
 	"XF86AudioLowerVolume",
 	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86AudioLowerVolume", hl.dsp.global("quickshell:volume_hud"), { repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.global("quickshell:status_volume_change"), { repeating = true })
 hl.bind(
 	"XF86AudioMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86AudioMute", hl.dsp.global("quickshell:volume_hud"), { repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.global("quickshell:status_volume_change"), { repeating = true })
 hl.bind(
-	"XF86AudioMicMute",
+	-- "XF86AudioMicMute",
+	"CTRL + XF86AudioMute",
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true, repeating = true }
 )
+hl.bind("CTRL + XF86AudioMute", hl.dsp.global("quickshell:status_volume_change"), { repeating = true })
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
