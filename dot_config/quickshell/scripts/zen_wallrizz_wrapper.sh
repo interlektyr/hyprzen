@@ -1,9 +1,9 @@
 #!/bin/bash
 
-FILE="/home/kristian/.config/quickshell/scripts/settings.json"
+FILE="$HOME/.config/quickshell/scripts/settings.json"
 WS_NUM="1"
 
-WallRizz -e -n -d /home/kristian/.config/quickshell/assets/wallpapers/
+WallRizz -e -n -d $HOME/.config/quickshell/assets/wallpapers/
 
 #echo "$newImg"
 
