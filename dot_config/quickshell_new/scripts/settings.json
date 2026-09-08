@@ -1,46 +1,46 @@
 {
   "1": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/1.jpg",
+    "img": "",
     "color": "#F5D098"
   },
   "2": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/2.jpg",
+    "img": "",
     "color": "#DBE6AF"
   },
   "3": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/3.jpg",
+    "img": "",
     "color": "#CAE0A7"
   },
   "4": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/4.jpg",
+    "img": "",
     "color": "#ADDEB9"
   },
   "5": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
+    "img": "",
     "color": "#ACE0D4"
   },
   "6": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/6.jpg",
+    "img": "",
     "color": "#AFDFE6"
   },
   "7": {
-    "img": "/home/trent/Hyprland/backup/quickshell/assets/wallpapers/7.jpg",
+    "img": "",
     "color": "#B2CFED"
   },
   "8": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/8.jpg",
+    "img": "",
     "color": "#D0BBF0"
   },
   "9": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/9.jpg",
+    "img": "",
     "color": "#F3C0E5"
   },
   "10": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/0.jpg",
+    "img": "",
     "color": "#F8F9E8"
   },
   "default": {
-    "img": "/home/trent/.config/quickshell/assets/wallpapers/0.jpg",
+    "img": "",
     "color": "#F5D098"
   }
 }
