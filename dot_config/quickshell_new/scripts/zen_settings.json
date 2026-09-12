@@ -1,16 +1,22 @@
 {
   "enable_dw": true,
   "dw": {
-    "1": "",
-    "2": "",
-    "3": "",
-    "4": "",
-    "5": "",
-    "6": "",
-    "7": "",
-    "8": "",
-    "9": "",
-    "10": ""
+    "1": "/home/kristian/.config/quickshell/assets/wallpapers/4.jpg",
+    "2": "/home/kristian/.config/quickshell/assets/wallpapers/6.jpg",
+    "3": "/home/kristian/.config/quickshell/assets/wallpapers/1.jpg",
+    "4": "/home/kristian/.config/quickshell/assets/wallpapers/9.jpg",
+    "5": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
+    "6": "/home/kristian/.config/quickshell/assets/wallpapers/8.jpg",
+    "7": "/home/kristian/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
+    "8": "/home/kristian/.config/quickshell/assets/wallpapers/7.jpg",
+    "9": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
+    "10": "/home/kristian/.config/quickshell/assets/wallpapers/3.jpg"
   },
-  "launch_term": "kitty"
+  "launch_term": "kitty",
+  "show_clock": true,
+  "low_time": 0,
+  "normal_time": 15,
+  "critical_time": -1,
+  "dnd": "no",
+  "dnd_toggle_alt": "yes"
 }
