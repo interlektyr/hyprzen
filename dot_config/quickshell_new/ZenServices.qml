@@ -74,12 +74,12 @@ Singleton {
   property bool showNoteWidget: false
   property bool passiveNoteWidget: true
   property bool setDoNotDisturbNote: false
-
-  Loader {
-    id: noteWidgetLoader
-    active: true 
-    source: "NotificationWidget.qml"
-  }
+  property int lowTime: fetchZenSettings.low_time
+  property int normalTime: fetchZenSettings.normal_time
+  property int criticalTime: fetchZenSettings.critical_time
+  property var toggleDnD: fetchZenSettings.dnd
+  property var dndToggleAlt: fetchZenSettings.dnd_toggle_alt
+  property bool showClock: fetchZenSettings.show_clock
 
   //StatusWidget
   property bool toggleStatusWidget: false
@@ -102,5 +102,15 @@ Singleton {
     active: ZenServices.toggleAppCommander
     source: "Appcommander.qml" 
   }
+
+  //Power-menu
+  property bool togglePowerMenu: false
+
+  Loader {
+    id: powerMenuLoader
+    active: ZenServices.togglePowerMenu
+    source: "PowerMenu.qml" 
+  }
+
 }
 

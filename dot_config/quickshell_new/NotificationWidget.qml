@@ -23,18 +23,39 @@ Scope {
   Connections {
     target: notifyService
     function onNotification(n) {
-      n.tracked = true;
-      hud.visible = true;
-      ZenServices.passiveNoteWidget = true;
+      if ((n.urgency === 0 && ZenServices.lowTime === 0) || (n.urgency === 1 && ZenServices.normalTime === 0) || (n.urgency === 2 && ZenServices.criticalTime === 0)) {
+        n.dismiss();
+      } else {
+        n.tracked = true;
+        hud.visible = true;
+        ZenServices.passiveNoteWidget = true;
+      }
     }
   }
 
   GlobalShortcut {
-      name: "notificationWidget_hud"
-      onPressed: {
-      ZenServices.passiveNoteWidget = false  
+    name: "clock_hud"
+    onPressed: {
+      if (ZenServices.showClock === true) {
+        ZenServices.showClock = false;
+      } else {
+        ZenServices.showClock = true;
       }
+    }
   }
+
+  GlobalShortcut {
+    name: "notificationWidget_hud"
+    onPressed: {
+      if (ZenServices.passiveNoteWidget === true) {
+        ZenServices.toggleDnD = "no";
+        ZenServices.passiveNoteWidget = false;
+      } else {
+        ZenServices.passiveNoteWidget = true;
+      }
+    }
+  }
+
  
   PanelWindow {
     id: hud
@@ -71,7 +92,7 @@ Scope {
         spacing: 5
 
         ClockWidgetComponent {
-          visible: true
+          visible: ZenServices.showClock
         }
 
         Rectangle {
@@ -79,7 +100,13 @@ Scope {
           height: 35
           width: height
           color: "transparent"
-          visible: false
+          visible: {
+            let v = false;
+            if (ZenServices.toggleDnD === "yes") {
+              v = true;
+            }
+            return v;
+          }
 
           Rectangle {
             id: dndCircle
@@ -87,7 +114,8 @@ Scope {
             height: 25
             width: height
             radius: width / 2
-            color: "black"
+            color: "pink"
+            visible: dndcircleContainer.visible === true && noteList.count > 0 ? true : false 
           }
         }
       }
@@ -97,7 +125,14 @@ Scope {
       width: hud.width
       height: hud.height
       color: "transparent"
-      opacity: 1 
+      opacity: 1
+      visible: {
+        let v = true;
+        if (ZenServices.toggleDnD === "yes" || ZenServices.toggleDnD === "total") {
+          v = false;
+        }
+        return v
+      }
  
       ListView {
         id: noteList

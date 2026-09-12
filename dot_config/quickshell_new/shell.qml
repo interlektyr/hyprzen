@@ -76,7 +76,17 @@ ShellRoot {
     }
   }
 
+  //PowerMenu
+  GlobalShortcut {
+    name: "power_hud"
+    onPressed: {
+      ZenServices.togglePowerMenu = true;
+    }
+  }
+
   Polkit {}
+
+  NotificationWidget {}
 
   ZenStatus {
     visible: ZenServices.toggleStatusWidget

@@ -107,12 +107,13 @@ Rectangle {
               //  root.closeNoteWidgetRequested();
               //}
             } else if (event.key === Qt.Key_D) {
-              if (doNotDisturbSet == false) {
-                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "toggledonotdisturbon"]);
+              event.accepted = true
+              if (ZenServices.toggleDnD === "no") {
+                ZenServices.toggleDnD = ZenServices.dndToggleAlt;
               } else {
-                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "toggledonotdisturboff"]);
+                ZenServices.toggleDnD = "no";
               }
-              doNotDisturb();
+              ZenServices.passiveNoteWidget = true 
             }
             //let item = NotificationList.history.get(noteList.currentIndex)
             //if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
@@ -243,11 +244,27 @@ Rectangle {
 
   Timer {
     id: dismissTimer
-    interval: 15000
+    interval: {
+      let t = 15;
+      if (modelData.urgency === 0) {
+        t = ZenServices.lowTime;
+      } else if (modelData.urgency === 1) {
+        t = ZenServices.normalTime;
+      } else if (modelData.urgency === 2) {
+        t = ZenServices.criticalTime;
+      }
+      if (t === -1) {
+        t = 1;
+      }
+      let adjustedTime = t * 1000
+      return adjustedTime
+    }
     running: false
     onTriggered: {
-      if (modelData.urgency !== 2) {  
-        modelData.dismiss(); 
+      if (ZenServices.passiveNoteWidget === true) {
+        if ((modelData.urgency === 0 && ZenServices.lowTime !== -1) || (modelData.urgency === 1 && ZenServices.normalTime !== -1) || (modelData.urgency === 2 && ZenServices.criticalTime !== -1)) {  
+          modelData.dismiss(); 
+        }
       }
     }
   }
