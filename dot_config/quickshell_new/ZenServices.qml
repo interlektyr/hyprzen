@@ -80,6 +80,7 @@ Singleton {
   property var toggleDnD: fetchZenSettings.dnd
   property var dndToggleAlt: fetchZenSettings.dnd_toggle_alt
   property bool showClock: fetchZenSettings.show_clock
+  property bool toggleDismissAll: false
 
   //StatusWidget
   property bool toggleStatusWidget: false

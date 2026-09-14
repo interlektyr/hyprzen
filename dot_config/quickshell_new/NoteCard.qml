@@ -69,17 +69,17 @@ Rectangle {
               event.accepted = true;
             }
             if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)) {
-              console.log("Tryckt");
-              let listModel = ListView.view.model
-              if (listModel) {
-                let allNotifs = Array.from(listModel)
-                console.log(allNotifs.length)
-                for (let i = 0; i < allNotifs.length; i++) {
-                  if (allNotifs[i]) {
-                    allNotifs[i].dismiss()
-                  }
-                }
-              }
+              //console.log("Tryckt");
+              //let listModel = ListView.view.model
+              //if (listModel) {
+              //  let allNotifs = Array.from(listModel)
+              //  console.log(allNotifs.length)
+              //  for (let i = 0; i < allNotifs.length; i++) {
+              //    if (allNotifs[i]) {
+              //      allNotifs[i].dismiss()
+              //    }
+              //  }
+              //}
               //let allNotifs = Array.from(serverRef.trackedNotifications)
               //console.log(allNotifs.length);
               //for (let i = 0; i < allNotifs.length; i++) {
@@ -87,7 +87,8 @@ Rectangle {
               //    allNotifs[i].dismiss()
               //  }
               //}
-              event.accepted = true
+              event.accepted = true;
+              ZenServices.toggleDismissAll = true;
               //event.accepted = true;
               //NotificationList.history.clear();
               //NotificationList.now.clear();

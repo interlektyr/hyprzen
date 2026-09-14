@@ -33,6 +33,17 @@ Scope {
     }
   }
 
+  Timer {
+    id: dismissAll
+    interval: 500     
+    running: ZenServices.toggleDismissAll
+    repeat: false
+    onTriggered: {
+      notifyService.trackedNotifications.clear();
+      ZenServices.toggleDismissAll = false;
+    }
+  }
+
   GlobalShortcut {
     name: "clock_hud"
     onPressed: {
