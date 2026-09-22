@@ -1,16 +1,17 @@
-{
+{ 
+  "bat_name": "BAT0",
   "enable_dw": true,
   "dw": {
-    "1": "/home/kristian/.config/quickshell/assets/wallpapers/4.jpg",
-    "2": "/home/kristian/.config/quickshell/assets/wallpapers/6.jpg",
-    "3": "/home/kristian/.config/quickshell/assets/wallpapers/1.jpg",
-    "4": "/home/kristian/.config/quickshell/assets/wallpapers/9.jpg",
-    "5": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
-    "6": "/home/kristian/.config/quickshell/assets/wallpapers/8.jpg",
-    "7": "/home/kristian/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
-    "8": "/home/kristian/.config/quickshell/assets/wallpapers/7.jpg",
-    "9": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
-    "10": "/home/kristian/.config/quickshell/assets/wallpapers/3.jpg"
+    "1": "/home/kristian/.config/quickshell/assets/wallpapers/3.jpg",
+    "2": "/home/kristian/.config/quickshell/assets/wallpapers/9.jpg",
+    "3": "/home/kristian/.config/quickshell/assets/wallpapers/4.jpg",
+    "4": "/home/kristian/.config/quickshell/assets/wallpapers/1.jpg",
+    "5": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
+    "6": "/home/kristian/.config/quickshell/assets/wallpapers/7.jpg",
+    "7": "/home/kristian/.config/quickshell/assets/wallpapers/6.jpg",
+    "8": "/home/kristian/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
+    "9": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
+    "10": "/home/kristian/.config/quickshell/assets/wallpapers/8.jpg"
   },
   "launch_term": "kitty",
   "show_clock": true,
