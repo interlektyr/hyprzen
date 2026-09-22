@@ -220,7 +220,7 @@ Rectangle {
                     font.pixelSize: 14
                     font.family: "DepartureMono Nerd Font Mono"
             //      text: modelData 
-                    text: "[ " + (index + 1) + " ] " + modelData.text
+                    text: "[" + (index + 1) + "] " + modelData.text
                   //text: "test"
             //      color: "black"
             //      font.pixelSize: 14 

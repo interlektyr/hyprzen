@@ -84,7 +84,8 @@ Singleton {
 
   //StatusWidget
   property bool toggleStatusWidget: false
-  property var typeOfStat: "volume" 
+  property var typeOfStat: "volume"
+  property var batName: fetchZenSettings.bat_name 
 
   Timer {
     id: timeCloseStatusWidget
@@ -92,6 +93,20 @@ Singleton {
     running: root.toggleStatusWidget = true
     repeat: true
     onTriggered: root.toggleStatusWidget = false;
+  }
+
+  Process {
+    id: batChecking
+  }
+
+  function checkBattery() {
+
+    batChecking.command = [
+      "zenctl", "battery"
+    ];
+
+    batChecking.running = true;
+
   }
 
   //AppCommander

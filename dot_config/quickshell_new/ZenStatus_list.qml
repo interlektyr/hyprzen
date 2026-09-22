@@ -95,7 +95,7 @@ PanelWindow {
     }
     networkProcess.running = true;
   }
- 
+
   Process {
     id: activeWinTitle
     command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "gettitleofactivewin"] 
@@ -112,8 +112,7 @@ PanelWindow {
 
   Process {
     id: networkProcess
-    //command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "getconnections"] // Ändra till absolut sökväg till ditt skript
-    command: ["zenctl", "connections"]
+    command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/zen_terminal_wrapper.sh", "getconnections"] // Ändra till absolut sökväg till ditt skript
     running: true    
     stdout: StdioCollector {
       onStreamFinished: {
@@ -295,7 +294,9 @@ PanelWindow {
 
   Rectangle {
     id: statusRect
-    width: componentRow.width + 15
+    //anchors.centerIn: parent
+    width: componentRow.contentWidth + 10
+    //width: 500
     height: 35
     radius: 10
     //color: "#191d1f"
@@ -307,62 +308,123 @@ PanelWindow {
     visible: statusBase.visible
 
     Behavior on opacity { NumberAnimation { duration: 200 } }
-    //Behavior on scale { NumberAnimation { duration: 300; easing.type: Easing.OutBack } }
 
-    //Component.onCompleted: {
-    //statusRect.visible = true
-    //}
-
-
-    Row {
+    ListView {
       id: componentRow
-      anchors.centerIn: parent
-      spacing: statusBase.typeStat == "battery" ? 5 : 10
-
-      Repeater {
-        model: {
-          if (statusBase.typeStat == "volume" || statusBase.typeStat == "volume_change") {
+      anchors.fill: parent
+      leftMargin: Math.max(0, (width - contentWidth) / 2) - (statusBase.typeStat == "connections" ? 5 : 0)
+      rightMargin: leftMargin
+      model: {
+        if (statusBase.typeStat == "volume" || statusBase.typeStat == "volume_change") {
             return statusBase.volEntries;
-          } else if (statusBase.typeStat == "battery") {
+        } else if (statusBase.typeStat == "battery") {
             return statusBase.powerEntries;
-          } else if (statusBase.typeStat == "connections") {
+        } else if (statusBase.typeStat == "connections") {
             return statusBase.connEntries;
-          }
         }
-        delegate: Row {
-        visible: modelData.shown 
-        spacing: modelData.id == "blue" ? 5 : 10
-        Rectangle {
-          id: statusIcon
-          width: 20
-          height: 20
-          color: "transparent"
-
-          Text {
-            id: iconText
-            anchors.centerIn: parent
-            text: modelData.statusIcon 
-            //color: "#F5D098"
-            color: modelData.col
-            font.family: "Work Sans"
-            font.weight: Font.ExtraBold
-            font.letterSpacing: 0
-            font.pixelSize: 25
-          }
-        }
-
-        Text {
-          id: statusText
-          text: modelData.statusText
-          //text: "Test"
-          color: "#F5D098"
-          font.family: "DepartureMono Nerd Font Mono"
-          font.weight: Font.ExtraBold
-          font.letterSpacing: 0
-          font.pixelSize: 18
-        }
-      }
-      }
     }
+    currentIndex: 0
+    highlightMoveDuration: 200
+    highlightFollowsCurrentItem: true
+    orientation: ListView.Horizontal
+    spacing: 10 // Sätt ett gemensamt avstånd här i stället
+
+    delegate: Item {
+        id: itemDelegate
+        // Beräkna bredden automatiskt baserat på barnen i Row, 
+        // eller ta bort fast bredd så raden styr storleken
+        width: modelData.shown ? rowItem.implicitWidth : 0 
+        height: parent.height
+        visible: modelData.shown 
+
+        Row {
+            id: rowItem
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: modelData.id == "blue" ? 5 : 10
+
+            // Ikon
+            Rectangle {
+              id: iconRect
+              anchors.verticalCenter: parent.verticalCenter - 2
+              //anchors.horizontalCenter: parent.horizontalCenter
+              width: 20
+              height: 20
+              color: "transparent"
+
+            Text {
+              id: iconText
+              anchors.centerIn: parent
+                //anchors.verticalCenter: parent.verticalCenter
+                text: modelData.statusIcon 
+                color: modelData.col
+                font.family: "Work Sans"
+                font.weight: Font.ExtraBold
+                font.pixelSize: 22 // Matcha storleken lite bättre mot radhöjden
+              }
+            }
+
+            // Text
+            Text {
+                id: statusText
+                anchors.verticalCenter: parent.verticalCenter
+                text: modelData.statusText
+                color: "#F5D098"
+                font.family: "DepartureMono Nerd Font Mono"
+                font.weight: Font.ExtraBold
+                font.pixelSize: 18 // Justera ner lite så det inte krockar med 20px höjd
+            }
+        }
+    }
+}
+    //Row {
+    //  id: componentRow
+    //  anchors.centerIn: parent
+    //  spacing: statusBase.typeStat == "battery" ? 5 : 10
+
+   //   Repeater {
+   //     model: {
+   //       if (statusBase.typeStat == "volume" || statusBase.typeStat == "volume_change") {
+   //         return statusBase.volEntries;
+   //       } else if (statusBase.typeStat == "battery") {
+   //         return statusBase.powerEntries;
+   //       } else if (statusBase.typeStat == "connections") {
+   //         return statusBase.connEntries;
+   //       }
+   //     }
+   //     delegate: Row {
+   //     visible: modelData.shown 
+   //     spacing: modelData.id == "blue" ? 5 : 10
+   //     Rectangle {
+   //       id: statusIcon
+   //       width: 20
+   //       height: 20
+   //       color: "transparent"
+
+   //       Text {
+   //         id: iconText
+   //         anchors.centerIn: parent
+   //         text: modelData.statusIcon 
+   //         //color: "#F5D098"
+   //         color: modelData.col
+   //         font.family: "Work Sans"
+   //         font.weight: Font.ExtraBold
+   //         font.letterSpacing: 0
+   //         font.pixelSize: 25
+   //       }
+   //     }
+
+   //     Text {
+   //       id: statusText
+   //       text: modelData.statusText
+          //text: "Test"
+   //       color: "#F5D098"
+   //       font.family: "DepartureMono Nerd Font Mono"
+   //       font.weight: Font.ExtraBold
+   //       font.letterSpacing: 0
+   //       font.pixelSize: 18
+   //     }
+   //   }
+   //   }
+  //  }
   }
 }

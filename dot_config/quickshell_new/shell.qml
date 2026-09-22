@@ -39,7 +39,10 @@ ShellRoot {
   GlobalShortcut {
     name: "status_battery"
     onPressed: {
-      if (ZenServices.toggleStatusWidget == false || ZenServices.typeOfStat !== "battery") {
+      if (ZenServices.batName === "") {
+        ZenServices.checkBattery();
+      }
+      if ((ZenServices.toggleStatusWidget == false || ZenServices.typeOfStat !== "battery") && (ZenServices.batName !== "no" || ZenServices.batName !== "")) {
         ZenServices.typeOfStat = "battery";
         ZenServices.toggleStatusWidget = true;
       } else {
@@ -90,5 +93,19 @@ ShellRoot {
 
   ZenStatus {
     visible: ZenServices.toggleStatusWidget
+  }
+
+  //IPC 
+
+  IpcHandler {
+    target: "control"
+
+    function toggleAppCom(): void {
+      if (ZenServices.toggleAppCommander === true) {
+        !ZenServices.toggleAppCommander;
+      } else {
+        ZenServices.toggleAppCommander = true;
+      }
+    }
   }
 }

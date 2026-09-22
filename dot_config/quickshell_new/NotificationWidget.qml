@@ -39,7 +39,15 @@ Scope {
     running: ZenServices.toggleDismissAll
     repeat: false
     onTriggered: {
-      notifyService.trackedNotifications.clear();
+      
+      while (notifyService.trackedNotifications.values.length > 0) {
+
+        for (let i = 0; i < notifyService.trackedNotifications.values.length; i++) {
+          if (notifyService.trackedNotifications.values[i]) {
+            notifyService.trackedNotifications.values[i].dismiss();
+          }
+        }
+      }
       ZenServices.toggleDismissAll = false;
     }
   }

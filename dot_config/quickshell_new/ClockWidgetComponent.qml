@@ -54,6 +54,8 @@ Item {
         running: true
         repeat: true
         onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+        //HH:mm
+        //for h:m ap clockRect width 100 and Item width also 100
       }
     }
   }
