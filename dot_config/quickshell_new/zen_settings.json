@@ -1,16 +1,23 @@
-{
+{ 
+  "bat_name": "BAT0",
   "enable_dw": true,
   "dw": {
-    "1": "zen_default_bg.jpg",
-    "2": "zen_default_bg.jpg",
-    "3": "zen_default_bg.jpg",
-    "4": "zen_default_bg.jpg",
-    "5": "zen_default_bg.jpg",
-    "6": "zen_default_bg.jpg",
-    "7": "zen_default_bg.jpg",
-    "8": "zen_default_bg.jpg",
-    "9": "zen_default_bg.jpg",
-    "10": "zen_default_bg.jpg"
+    "1": "/home/kristian/.config/quickshell/assets/wallpapers/3.jpg",
+    "2": "/home/kristian/.config/quickshell/assets/wallpapers/9.jpg",
+    "3": "/home/kristian/.config/quickshell/assets/wallpapers/4.jpg",
+    "4": "/home/kristian/.config/quickshell/assets/wallpapers/1.jpg",
+    "5": "/home/kristian/.config/quickshell/assets/wallpapers/2.jpg",
+    "6": "/home/kristian/.config/quickshell/assets/wallpapers/7.jpg",
+    "7": "/home/kristian/.config/quickshell/assets/wallpapers/6.jpg",
+    "8": "/home/kristian/.config/quickshell/assets/wallpapers/clay-banks-u27Rrbs9Dwc-unsplash.jpg",
+    "9": "/home/kristian/.config/quickshell/assets/wallpapers/0.jpg",
+    "10": "/home/kristian/.config/quickshell/assets/wallpapers/8.jpg"
   },
-  "launch_term": "kitty -e"
+  "launch_term": "kitty",
+  "show_clock": true,
+  "low_time": 0,
+  "normal_time": 15,
+  "critical_time": -1,
+  "dnd": "no",
+  "dnd_toggle_alt": "yes"
 }
