@@ -1,0 +1,263 @@
+#!/bin/bash
+
+## ARGUMENTS FOR zenctrl
+
+a=$1
+b=$2
+c=$3
+
+j_value=""
+
+## PATH TO zen_settings
+
+file="$HOME/.config/quickshell/scripts/zen_settings.json"
+
+## FUNDAMENTAL FUNCTIONS
+
+banner() {
+  local one=$1
+  local two=$2
+
+  gum style \
+    --foreground 212 --border-foreground 212 --border double \
+    --align center --width 50 --margin "1 2" --padding "2 4" \
+    "${one}" "${two}"
+}
+
+small_banner() {
+  local one=$1
+
+  gum style \
+    --foreground 212 --border-foreground 212 --border double \
+    --align center --width 50 --margin "1 2" --padding "2 4" \
+    "${one}"
+}
+
+update_string() {
+  # $1 is key and $2 is value
+  local key="$1"
+  local n_value="$2"
+  jq --arg find_key "$key" --arg new_value "$n_value" '.[$find_key] = $new_value' "$file" >temp.json && mv temp.json "$file"
+}
+
+update_bool() {
+  local bool_key="$1"
+  local n_bool="$2"
+  jq --arg find_bool_key "$bool_key" --argjson new_bool "$n_bool" '.[$find_bool_key] = $new_bool' "$file" >temp.json && mv temp.json "$file"
+}
+
+update_int() {
+  local int_key="$1"
+  local n_int="$2"
+  jq --arg find_int_key "$int_key" --argjson new_int "$n_int" '.[$find_int_key] = $new_int' "$file" >temp.json && mv temp.json "$file"
+}
+
+find_value() {
+  local find="$1"
+  j_value=$(jq -r --arg k "$find" '.[$k]' $file)
+}
+
+## INTERNAL FUNCTIONS
+
+get_battery() {
+  bat_path=$(echo "/sys/class/power_supply/BAT"*)
+  bat_n=""
+  if [ -d $bat_path ]; then
+    bat_n="$(basename $bat_path)"
+  else
+    bat_n="no"
+    ##echo "No. No battery"
+  fi
+  update_string bat_name $bat_n
+  exit
+}
+
+get_connections() {
+
+  wifi="disconnected"
+  wifi_signal="0"
+  ssid=""
+  wifi_ip=""
+  eto=""
+  ethernet="disconnected"
+  ethernet_ip="none"
+  wireguard="DISABLED"
+  wireguard_location=""
+  wireguard_ip=""
+  access="ONLINE"
+  fw="DOWN"
+  torrent_server="NOT RUNNING"
+  torrent_downloading="false"
+  torrent_seeding="false"
+  bluetooth_power="OFF"
+  bluetooth_devices="[]"
+
+  if bluetoothctl show | grep -q "Powered: yes"; then
+    bluetooth_power="ON"
+
+    device_list=$(bluetoothctl devices Connected | cut -d' ' -f3- | sed 's/"/\\"/g' | awk '{print "\""$0"\""}' | paste -sd, -)
+
+    if [ -n "$device_list" ]; then
+      bluetooth_devices="[$device_list]"
+    fi
+  fi
+
+  if which transmission-cli >/dev/null; then
+    if pgrep -x "transmission-da" >/dev/null; then
+      torrent_server="RUNNING"
+      summary=$(transmission-remote -l 2>/dev/null | tail -n 1)
+      if [ -n "$summary" ]; then
+        all_torrents=$(transmission-remote -l 2>/dev/null)
+        if echo "$all_torrents" | grep -q "Downloading"; then
+          torrent_downloading="true"
+        fi
+        up_speed=$(echo "$summary" | awk '{print $(NF-3)}')
+        down_speed=$(echo "$summary" | awk '{print $(NF-2)}')
+        if [ "$down_speed" != "0.0" ] && [ "$down_speed" != "None" ]; then
+          torrent_downloading="true"
+        fi
+        if [ "$up_speed" != "0.0" ] && [ "$up_speed" != "None" ]; then
+          torrent_seeding="true"
+        fi
+      fi
+    fi
+  fi
+
+  if [ "$(cat /etc/ufw/ufw.conf | grep ENABLED=yes)" = "ENABLED=yes" ]; then
+    fw="UP"
+  fi
+
+  while IFS=: read -r dev type state conn; do
+    current_ip=$(ip -4 addr show dev "$dev" 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1 | head -n1)
+    #clean_ip="${ip%/*}"
+
+    case "$type" in
+    "wifi")
+      wifi="$state"
+      if [ "$state" = "connected" ]; then
+        ssid="$conn"
+        wifi_ip="$current_ip"
+        wifi_signal=$(nmcli -t -f IN-USE,SIGNAL device wifi | awk -F':' '$1 ~ /\*/ {print $2}' | head -n1)
+      fi
+      ;;
+    "ethernet")
+      if [ "$state" = "connected" ] || [ "$ethernet" != "connected" ]; then
+        ethernet="$state"
+        if [ "$ethernet" = "connected" ]; then
+          eto="$conn"
+          ethernet_ip="$current_ip"
+        fi
+      fi
+      ;;
+    "wireguard")
+      if [ "$state" = "connected" ] || [ "$wireguard" != "connected" ]; then
+        wireguard="ENABLED"
+      fi
+      ;;
+    esac
+  done < <(nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device)
+
+  if [ "$ethernet" = "disconnected" ] && [ "$wifi" = "disconnected" ]; then
+    access="OFFLINE"
+  fi
+
+  if [ "$wireguard" = "ENABLED" ]; then
+    if which mullvad-vpn >/dev/null; then
+      wireguard_location="$(mullvad status | awk '/Visible location: / {print $3 $4}' | sed 's/\.$//')"
+      wireguard_ip="$(mullvad status | awk '/Visible location: / {print $6}')"
+    else
+      wireguard_location="ENABLED"
+      wireguard_ip="unknown"
+    fi
+  fi
+
+  cat <<EOF
+{
+  "access": "$access",
+  "wifi": "$wifi",
+  "wifi_signal": $wifi_signal,
+  "ssid": "$ssid",
+  "wifi_ip": "$wifi_ip",
+  "eto": "$eto",
+  "ethernet": "$ethernet",
+  "ethernet_ip": "$ethernet_ip",
+  "wireguard": "$wireguard",
+  "wireguard_location": "$wireguard_location",
+  "wireguard_ip": "$wireguard_ip",
+  "fw": "$fw",
+  "torrent_server": "$torrent_server",
+  "torrent_downloading": "$torrent_downloading",
+  "torrent_seeding": "$torrent_seeding",
+  "bluetooth_power": "$bluetooth_power",
+  "bluetooth_devices": $bluetooth_devices
+}
+EOF
+  exit
+
+}
+
+## UPDATE
+
+update_system() {
+  clear
+  grep -q '^ID=cachyos' /etc/os-release && IS_CACHY=true || IS_CACHY=false
+
+  if $IS_CACHY; then
+    small_banner 'UPDATE CACHYOS'
+    sudo cachyos-rate-mirrors
+    cachy-update
+  else
+    small_banner 'UPDATE ARCH'
+    sudo rate-mirrors arch | sudo tee /etc/pacman.d/mirrorlist
+    arch-update
+  fi
+}
+
+## MAIN MENU
+
+main_menu() {
+
+  banner ZENCTRL 'CLI tool for zenshell'
+
+  main_opt=$(
+    gum choose --header="Main menu:" \
+      "update system" "dynamic wallpapers" "terminal emulator" \
+      "colors" "clock widget" "notifications" "exit"
+  )
+
+  case $main_opt in
+  "update system")
+    update_system
+    ;;
+  "dynamic wallpapers")
+    echo "yes"
+    ;;
+  "terminal emulator")
+    find_value launch_term
+    echo "$j_value"
+    ;;
+  "exit")
+    exit
+    ;;
+  *)
+    exit 1
+    ;;
+  esac
+}
+
+##TESTING
+
+case $a in
+"battery")
+  get_battery
+  ;;
+"connections")
+  get_connections
+  ;;
+*)
+  main_menu
+  exit
+  ;;
+esac
+
+main_menu
