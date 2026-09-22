@@ -217,7 +217,7 @@ update_system() {
 
 main_menu() {
 
-  banner ZENCTRL 'CLI tool for zenshell'
+  banner ZENCTL 'CLI tool for zenshell'
 
   main_opt=$(
     gum choose --header="Main menu:" \
