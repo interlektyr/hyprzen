@@ -2,7 +2,6 @@
 
 pmpkg=(
   "egl-wayland"
-  "grim"
   "hyprland"
   "hyprpolkitagent"
   "qt5-wayland"
@@ -18,6 +17,7 @@ pmpkg=(
   "uwsm"
   "hyprpicker"
   "wl-clipboard"
+  "dunst"
   "gum"
   "git"
   "wget"
@@ -31,7 +31,7 @@ pmpkg=(
   "vim"
   "neovide"
   "bottom"
-  "imv"
+  "qview"
   "yazi"
   "ffmpeg"
   "7zip"
@@ -47,8 +47,13 @@ pmpkg=(
   "quickshell"
   "hyprshot"
   "sddm"
-  "awww"
+  "awww" ## Works on CachyOS, otherwise paru
+  "kvantum"
+  "kvantum-qt5"
+  "nwg-look"
   "bluetui"
+  "asusctl"            ## Works on CachyOS
+  "rog-control-center" ## Works on CachyOS
 )
 
 parpkg=(
@@ -59,9 +64,7 @@ parpkg=(
   "zen-browser-bin"
   "selectdefaultapplication-git"
   "dragon-drop"
-  "asusctl"
   "hyprmoncfg"
-  "rog-control-center"
 )
 
 case $(gum choose --header="What is your base OS?" "CachyOS" "Vanilla Arch" "Quit") in
@@ -111,3 +114,5 @@ ya pkg add stelcodes/bunny
 ya pkg add uhs-robert/recycle-bin
 
 sudo curl -sL $(curl -s https://api.github.com/repos/5hubham5ingh/WallRizz/releases/latest | grep -Po '"browser_download_url": "\K[^"]+' | grep WallRizz) | tar -xz && sudo mv WallRizz /usr/bin/
+
+git clone https://github.com/vinceliuice/Colloid-gtk-theme.git
