@@ -79,9 +79,9 @@ PanelWindow {
     { id: "status", statusIcon: "󱜡", statusText: "OFFLINE", shown: statusBase.access == "ONLINE" ? false : true, col: "#E67E80" },
     { id: "cable", statusIcon: "󰈀", statusText: "PLUGGED", shown: statusBase.ethernetIp !== "none" ? true : false, col: "#A7C080" },
     { id: "wifi", statusIcon: statusBase.wifiIcon, statusText: statusBase.ssid, shown: statusBase.wifi == "connected" ? true : false, col: statusBase.wifiIconColor },
-    { id: "fw", statusIcon: statusBase.fw == "DISABLED" ? "" : "󰒘", statusText: statusBase.fw == "DISABLED" ? "DOWN" : "UP", shown: true, col: statusBase.fw == "DISABLED" ? "#E67E80" : "#A7C080"},
+    { id: "fw", statusIcon: statusBase.fw == "DOWN" ? "" : "󰒘", statusText: statusBase.fw == "DOWN" ? "DOWN" : "UP", shown: true, col: statusBase.fw == "DOWN" ? "#E67E80" : "#A7C080"},
     { id: "vpn", statusIcon: "󱐡", statusText: statusBase.wireguardLocation, shown: statusBase.wireguard == "DISABLED" ? false : true, col: "#A7C080" },
-    { id: "blue", statusIcon: "󰂯", statusText: statusBase.bluetoothDevices.count > 0 ? "CONNECTED (" + statusBase.bluetoothDevices.count + " devices)" : "ON", shown: statusBase.bluetoothPower == "ON" ? true : false, col: "#A7C080" },
+    { id: "blue", statusIcon: "󰂯", statusText: statusBase.bluetoothDevices.length > 0 ? "(" + statusBase.bluetoothDevices.length + ")" : "ON", shown: statusBase.bluetoothPower == "ON" ? true : false, col: "#A7C080" },
     { id: "torrent", statusIcon: "  ", statusText: " RUNNING (" + (statusBase.torrentDownloading ? "leaching" : "") + (statusBase.torrentDownloading && statusBase.torrentSeeding ? "/" : "") + (statusBase.torrentSeeding ? "seeding)" : "idle)"), shown: statusBase.torrentServer == "NOT RUNNING" ? false : true, col: "#A7C080" }
   ]
 

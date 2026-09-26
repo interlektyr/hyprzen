@@ -41,6 +41,14 @@ Singleton {
     }
   }
 
+  //Font
+  FontLoader {
+    id: workSans
+    source: "./assets/fonts/WorkSans-VariableFont_wght.ttf"
+  }
+
+  readonly property string titleFont: workSans.name
+
   //Dynamic wallpapers 
   property var newWallpaper: fetchZenSettings.dw[root.activeWorkspace]
 
