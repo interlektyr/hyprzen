@@ -84,7 +84,7 @@ get_connections() {
   wireguard="DISABLED"
   wireguard_location=""
   wireguard_ip=""
-  access="ONLINE"
+  access="OFFLINE"
   fw="DOWN"
   torrent_server="NOT RUNNING"
   torrent_downloading="false"
@@ -157,7 +157,9 @@ get_connections() {
     esac
   done < <(nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device)
 
-  if [ "$ethernet" = "disconnected" ] && [ "$wifi" = "disconnected" ]; then
+  if curl -fsS --max-time 5 -o /dev/null https://www.google.com/generate_204; then
+    access="ONLINE"
+  else
     access="OFFLINE"
   fi
 
@@ -217,7 +219,7 @@ update_system() {
 
 main_menu() {
 
-  banner ZENCTL 'CLI tool for zenshell'
+  banner ZENCTRL 'CLI tool for zenshell'
 
   main_opt=$(
     gum choose --header="Main menu:" \
