@@ -295,7 +295,7 @@ PanelWindow {
 
   Rectangle {
     id: statusRect
-    width: componentRow.width + 15
+    width: componentRow.width + 30
     height: 35
     radius: 10
     //color: "#191d1f"
@@ -355,7 +355,8 @@ PanelWindow {
           id: statusText
           text: modelData.statusText
           //text: "Test"
-          color: "#F5D098"
+          //color: "#F5D098"
+          color: "white"
           font.family: "DepartureMono Nerd Font Mono"
           font.weight: Font.ExtraBold
           font.letterSpacing: 0
