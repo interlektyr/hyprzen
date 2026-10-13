@@ -73,6 +73,8 @@ hl.bind(mainMod .. " + CTRL + down", hl.dsp.window.move({ workspace = "special:s
 
 --temp
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.workspace.toggle_special("stash"))
+--hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd("grim -g "$(slurp)"))
+hl.bind(mainMod .. " + CTRL + Y", hl.dsp.exec_cmd('grim -g "$(slurp)"'))
 
 ---LAYOUTS
 --- SUPER + LMB: Floats a window by either SUPER + V or SUPER + LMB + clicking
