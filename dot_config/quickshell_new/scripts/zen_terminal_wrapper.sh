@@ -7,8 +7,29 @@ cmStringArg=$3
 # COMMAND FOR GETTING FOCUES window
 
 check_focus_title() {
-  fotile=$(hyprctl activewindow -j | jq -r ".title")
-  echo "$fotile"
+  hytitle="Unknown"
+  hyclass="Unknown"
+  hytitlec=""
+  max=50
+
+  hytitle=$(hyprctl activewindow -j | jq -r ".title")
+  hyclass=$(hyprctl activewindow -j | jq -r ".class")
+
+  if [ ${#hytitle} -gt $max ]; then
+    hytitlec="${hytitle:0:max}..."
+  else
+    hytitlec="$hytitle"
+  fi
+
+  # echo "$fotile"
+
+  cat <<EOF
+{
+  "hyclass": "$hyclass",
+  "hytitle": "$hytitlec"
+}
+EOF
+
   exit
 }
 
